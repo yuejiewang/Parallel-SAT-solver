@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <map>
 #include <vector>
 #include <fstream>
 #include <sstream>
@@ -26,6 +27,9 @@ void printClauses(vector<vector<string>> clauses) {
     }
 }
 
+string DPLL(vector<vector<string>> clauses, map<string, bool> bindings){
+    return "Fail";
+}
 
 void runWithInputFile(string inputFileName) {
     // Create a text string, which is used to output the text file
@@ -56,11 +60,22 @@ void runWithInputFile(string inputFileName) {
     // Close the file
     inputFile.close();
 
+    // Run the actual DPLL algorithm
+    map<string, bool> m;
+    string answer = DPLL(originalClauses, m);
+    string output;
+    if (answer.compare("Fail") == 0){
+        output = "NO SOLUTION";
+    } else {
+        output = "Placeholder";
+        // '\n'.join([f"{k} {str(v)[0]}" for k, v in sorted(answer.items(), key=lambda i: int(i[0]))]))
+    }
+
     // Create and open output file
-    ofstream outputFile("sequential_dpll_output.txt");
+    ofstream outputFile("../sequential_dpll_output.txt");
 
     // Write to the file
-    outputFile << "Files can be tricky, but it is fun enough!";
+    outputFile << output + "\n" + key;
     cout << "writing to: sequential_dpll_output.txt" << endl;
 
     // Close the file
