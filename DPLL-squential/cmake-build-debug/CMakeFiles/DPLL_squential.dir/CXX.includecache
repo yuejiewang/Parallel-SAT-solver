@@ -9,4 +9,12 @@
 /Users/Nellie/Desktop/Zahran-Multicore/Parallel-SAT-solver/DPLL-squential/main.cpp
 iostream
 -
+string
+-
+vector
+-
+fstream
+-
+sstream
+-
 
