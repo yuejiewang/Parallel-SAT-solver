@@ -4,12 +4,20 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include <cctype>
 
 
 using namespace std;
 
 string key = "";
 vector<vector<string>> originalClauses;
+vector<string> atoms;
+
+struct State {
+    vector<vector<string>> clauses;
+    map<string, bool> bindings;
+};
+
 
 vector<string> splitClause(string s) {
     stringstream ss(s);
@@ -20,15 +28,185 @@ vector<string> splitClause(string s) {
 }
 
 void printClauses(vector<vector<string>> clauses) {
-    for ( const std::vector<string> &v : clauses )
-    {
-        for ( string x : v ) std::cout << x << ' ';
+    for (const std::vector<string> &v : clauses) {
+        for (string x : v) std::cout << x << ' ';
         std::cout << std::endl;
     }
 }
 
-string DPLL(vector<vector<string>> clauses, map<string, bool> bindings){
-    return "Fail";
+
+string atom_of(string literal) {
+    string s;
+    if (literal[0] == '-') {
+        s.push_back(literal[1]);
+    } else {
+        s.push_back(literal[0]);
+    }
+    return s;
+}
+
+
+bool value_of(string literal) {
+    return literal[0] != '-';
+}
+
+
+void makeAtomList(vector<vector<string>> clauses) {
+    for (int i = 0; i < clauses.size(); i++) {
+        vector<string> clause = clauses[i];
+        for (int j = 0; j < clauses.size(); j++) {
+            string literal = clause[j];
+            atoms.push_back(atom_of(literal));
+        }
+    }
+}
+
+bool containsEmptyClause( vector<vector<string>> clauses){
+    for(int i = 0; i < clauses.size(); i++){
+        if(clauses[i].size() == 0){
+            return true;
+        }
+    }
+    return false;
+}
+
+State propagate(State s, string atom, bool value) {
+    s.bindings.insert(pair<string, bool>(atom, value));
+    string literal, opposite;
+    if (value == true) {
+        literal = atom;
+        opposite = "-" + atom;
+    } else {
+        literal = "-" + atom;
+        opposite = atom;
+    }
+    vector<vector<string>> result_clauses;
+    for (int i = 0; i < s.clauses.size(); i++) {
+        vector<string> clause = s.clauses[i];
+        vector<string>::iterator oppIndex = find(clause.begin(), clause.end(), opposite);
+        if (oppIndex != clause.end()) {
+            clause.erase(oppIndex);
+        }
+        vector<string>::iterator litIndex = find(clause.begin(), clause.end(), literal);
+        if (litIndex == clause.end()) {
+            result_clauses.push_back(clause);
+        }
+    }
+    return State{result_clauses, s.bindings};
+}
+
+State handleEasyCases(State s) {
+    vector<vector<string>> clauses = s.clauses;
+    map<string, bool> bindings = s.bindings;
+
+    bool stillChanging = true;
+    map<string, bool> atomAppearances;
+    map<string, string> pureLiterals;
+    State result = s;
+    while (stillChanging) {
+        map<string, bool> oldBindings(bindings);
+        // look for case 1: singleton clause
+        for (int i = 0; i < clauses.size(); i++) {
+            vector<string> clause = clauses[i];
+            if (clause.size() == 1) {
+                result = propagate(result, atom_of(clause[0]), value_of(clause[0]));
+            } else {
+                // look for case 2: pure literal
+                for (int j = 0; j < clause.size(); j++) {
+                    string literal = clause[j];
+                    string atom = atom_of(literal);
+                    map<string, bool>::iterator iter = atomAppearances.find(atom);
+                    if (iter != atomAppearances.end()) { // if atom in atomAppearances
+                        bool atomValue = iter->second;
+                        map<string, string>::iterator iterLit = pureLiterals.find(atom);
+                        if (atomValue != value_of(literal) && iterLit != pureLiterals.end()) {
+                            pureLiterals.erase(atom);
+                        }
+                    } else {
+                        atomAppearances.insert(pair<string, bool>(atom, value_of(literal)));
+                        pureLiterals.insert(pair<string, string>(atom, literal));
+                    }
+                }
+            }
+        }
+        for (auto const&[key, literal] : pureLiterals) {
+            State result = propagate(result, atom_of(literal), value_of(literal));
+        }
+        if (oldBindings == s.bindings) {
+            stillChanging = false;
+        }
+    }
+    return result;
+}
+
+string nextUnboundAtom(State s){
+    vector<string> unbound;
+    for(int i = 0; i < s.clauses.size(); i++){
+        for(int j = 0; j < s.clauses[i].size(); j++){
+            string atom = atom_of(s.clauses[i][j]);
+            if(s.bindings.find(atom) == s.bindings.end()){
+                unbound.push_back(atom);
+            }
+        }
+    }
+    sort(unbound.begin(), unbound.end());
+    return unbound[0];
+}
+
+string stringifyBindings(map<string, bool> bindings) {
+    map<int, bool> intBindings;
+    for (auto const&[key, val] : bindings) {
+        intBindings.insert(pair<int, bool>(stoi(key), val));
+    }
+    string result;
+    for (auto const&[key, val] : bindings) {
+        result += key + " ";
+        result += val + "\n";
+    }
+    return result;
+}
+
+string DPLL(State s) {
+    vector<vector<string>> clauses = s.clauses;
+    map<string, bool> bindings = s.bindings;
+    if(clauses.size() == 0){
+        return stringifyBindings(bindings);
+    }
+    if(containsEmptyClause(clauses)){
+        return "Fail";
+    }
+    State easyCasesResult = handleEasyCases(s);
+    if(clauses.size() == 0){
+        return stringifyBindings(bindings);
+    }
+    if(containsEmptyClause(clauses)){
+        return "Fail";
+    }
+    vector<vector<string>> clausesCopy(clauses);
+    map<string, bool> bindingsCopy(bindings);
+    State stateCopy = State{clausesCopy, bindingsCopy};
+    string unboundAtom = nextUnboundAtom(stateCopy);
+    stateCopy = propagate(stateCopy, unboundAtom, true);
+    string answer = DPLL(stateCopy);
+    if(answer == "Fail"){
+        for(int i = 0; i < atoms.size(); i++){
+            string atom = atoms[i];
+            for(int j = 0; j < answer.size(); j++){
+                if(answer[j] == atom[0]){
+                    break;
+                }
+            }
+            answer += atom + " true\n";
+        }
+        return answer;
+    }
+    stateCopy = propagate(stateCopy, unboundAtom, false);
+    return DPLL(stateCopy);
+
+
+    //line 92
+
+    return DPLL(s);
 }
 
 void runWithInputFile(string inputFileName) {
@@ -43,8 +221,8 @@ void runWithInputFile(string inputFileName) {
     bool clauseMode = true;
     while (getline(inputFile, line)) {
         // Output the text from the file
-        if(clauseMode == false){
-            key += line +"\n";
+        if (clauseMode == false) {
+            key += line + "\n";
         } else if (line.compare("0") != 0 && clauseMode) {
             originalClauses.push_back(splitClause(line));
         } else {
@@ -61,10 +239,12 @@ void runWithInputFile(string inputFileName) {
     inputFile.close();
 
     // Run the actual DPLL algorithm
-    map<string, bool> m;
-    string answer = DPLL(originalClauses, m);
+    makeAtomList(originalClauses);
+    map<string, bool> b;
+    State original = State{originalClauses, b};
+    string answer = DPLL(original);
     string output;
-    if (answer.compare("Fail") == 0){
+    if (answer.compare("Fail") == 0) {
         output = "NO SOLUTION";
     } else {
         output = "Placeholder";
