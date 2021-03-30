@@ -5,9 +5,30 @@
 #include <fstream>
 #include <sstream>
 #include <cctype>
-
-
+#include <algorithm>
 using namespace std;
+
+
+// trim from start (in place)
+static inline void ltrim(std::string &s) {
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+        return !std::isspace(ch);
+    }));
+}
+
+// trim from end (in place)
+static inline void rtrim(std::string &s) {
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+        return !std::isspace(ch);
+    }).base(), s.end());
+}
+
+// trim from both ends (in place)
+static inline void trim(std::string &s) {
+    ltrim(s);
+    rtrim(s);
+}
+
 
 string key = "";
 vector<vector<string>> originalClauses;
@@ -20,6 +41,7 @@ struct State {
 
 
 vector<string> splitClause(string s) {
+    trim(s);
     stringstream ss(s);
     istream_iterator<string> begin(ss);
     istream_iterator<string> end;
@@ -28,9 +50,9 @@ vector<string> splitClause(string s) {
 }
 
 void printClauses(vector<vector<string>> clauses) {
-    for (const std::vector<string> &v : clauses) {
-        for (string x : v) std::cout << x << ' ';
-        std::cout << std::endl;
+    for (const vector<string> &v : clauses) {
+        for (string x : v) cout << x << ' ';
+        cout << endl;
     }
 }
 
@@ -54,9 +76,13 @@ bool value_of(string literal) {
 void makeAtomList(vector<vector<string>> clauses) {
     for (int i = 0; i < clauses.size(); i++) {
         vector<string> clause = clauses[i];
-        for (int j = 0; j < clauses.size(); j++) {
+        for (int j = 0; j < clause.size(); j++) {
             string literal = clause[j];
-            atoms.push_back(atom_of(literal));
+            string atom = atom_of(literal);
+            auto atomIndex = find(atoms.begin(), atoms.end(), atom);
+            if (atomIndex == atoms.end()) {
+                atoms.push_back(atom);
+            }
         }
     }
 }
@@ -84,11 +110,11 @@ State propagate(State s, string atom, bool value) {
     for (int i = 0; i < s.clauses.size(); i++) {
         vector<string> clause = s.clauses[i];
         vector<string>::iterator oppIndex = find(clause.begin(), clause.end(), opposite);
-        if (oppIndex != clause.end()) {
+        if (oppIndex != clause.end()) { // if opposite in clause
             clause.erase(oppIndex);
         }
         vector<string>::iterator litIndex = find(clause.begin(), clause.end(), literal);
-        if (litIndex == clause.end()) {
+        if (litIndex == clause.end()) { // if literal is not in clause
             result_clauses.push_back(clause);
         }
     }
@@ -130,7 +156,7 @@ State handleEasyCases(State s) {
             }
         }
         for (auto const&[key, literal] : pureLiterals) {
-            State result = propagate(result, atom_of(literal), value_of(literal));
+            result = propagate(result, atom_of(literal), value_of(literal));
         }
         if (oldBindings == s.bindings) {
             stillChanging = false;
@@ -247,7 +273,7 @@ void runWithInputFile(string inputFileName) {
     if (answer.compare("Fail") == 0) {
         output = "NO SOLUTION";
     } else {
-        output = "Placeholder";
+        output = answer;
         // '\n'.join([f"{k} {str(v)[0]}" for k, v in sorted(answer.items(), key=lambda i: int(i[0]))]))
     }
 
