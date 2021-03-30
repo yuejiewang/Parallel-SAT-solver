@@ -6,6 +6,7 @@
 #include <sstream>
 #include <cctype>
 #include <algorithm>
+
 using namespace std;
 
 
@@ -58,13 +59,14 @@ void printClauses(vector<vector<string>> clauses) {
 
 
 string atom_of(string literal) {
-    string s;
+//    string s;
     if (literal[0] == '-') {
-        s.push_back(literal[1]);
-    } else {
-        s.push_back(literal[0]);
+        literal.erase(0, 1);
+//        s.push_back(literal[1]);
+//    } else {
+//        s = literal;
     }
-    return s;
+    return literal;
 }
 
 
@@ -87,9 +89,9 @@ void makeAtomList(vector<vector<string>> clauses) {
     }
 }
 
-bool containsEmptyClause( vector<vector<string>> clauses){
-    for(int i = 0; i < clauses.size(); i++){
-        if(clauses[i].size() == 0){
+bool containsEmptyClause(vector<vector<string>> clauses) {
+    for (int i = 0; i < clauses.size(); i++) {
+        if (clauses[i].size() == 0) {
             return true;
         }
     }
@@ -122,55 +124,54 @@ State propagate(State s, string atom, bool value) {
 }
 
 State handleEasyCases(State s) {
-    vector<vector<string>> clauses = s.clauses;
-    map<string, bool> bindings = s.bindings;
-
     bool stillChanging = true;
-    map<string, bool> atomAppearances;
-    map<string, string> pureLiterals;
-    State result = s;
     while (stillChanging) {
-        map<string, bool> oldBindings(bindings);
-        // look for case 1: singleton clause
-        for (int i = 0; i < clauses.size(); i++) {
-            vector<string> clause = clauses[i];
-            if (clause.size() == 1) {
-                result = propagate(result, atom_of(clause[0]), value_of(clause[0]));
-            } else {
-                // look for case 2: pure literal
-                for (int j = 0; j < clause.size(); j++) {
-                    string literal = clause[j];
-                    string atom = atom_of(literal);
-                    map<string, bool>::iterator iter = atomAppearances.find(atom);
-                    if (iter != atomAppearances.end()) { // if atom in atomAppearances
-                        bool atomValue = iter->second;
-                        map<string, string>::iterator iterLit = pureLiterals.find(atom);
-                        if (atomValue != value_of(literal) && iterLit != pureLiterals.end()) {
-                            pureLiterals.erase(atom);
-                        }
-                    } else {
-                        atomAppearances.insert(pair<string, bool>(atom, value_of(literal)));
-                        pureLiterals.insert(pair<string, string>(atom, literal));
+        map<string, bool> oldBindings(s.bindings);
+        State resultState = State{s.clauses, s.bindings};
+        for (int i = 0; i < s.clauses.size(); i++) {
+            vector<string> clause = s.clauses[i];
+            if (clause.size() == 1) { // case 1: singleton clause
+                string literal = clause[0];
+                resultState = propagate(resultState, atom_of(literal), value_of(literal));
+            }
+        }
+        map<string, bool> atomAppearances;
+        map<string, string> pureLiterals;
+        for (int i = 0; i < resultState.clauses.size(); i++) {
+            vector<string> clause = resultState.clauses[i];
+            for (int j = 0; j < clause.size(); j++) {
+                string literal = clause[j];
+                string atom = atom_of(literal);
+                map<string, bool>::iterator iter = atomAppearances.find(atom);
+                if (iter != atomAppearances.end()) { // if atom in atomAppearances
+                    bool atomValue = iter->second;
+                    map<string, string>::iterator iterLit = pureLiterals.find(atom);
+                    if (atomValue != value_of(literal) && iterLit != pureLiterals.end()) { // not a pure literal
+                        pureLiterals.erase(atom);
                     }
+                } else {
+                    atomAppearances.insert(pair<string, bool>(atom, value_of(literal)));
+                    pureLiterals.insert(pair<string, string>(atom, literal));
                 }
             }
         }
-        for (auto const&[key, literal] : pureLiterals) {
-            result = propagate(result, atom_of(literal), value_of(literal));
+        for (auto const&[atom, literal] : pureLiterals) { // handle case 2: pure literals
+            resultState = propagate(resultState, atom, value_of(literal));
         }
-        if (oldBindings == s.bindings) {
+        if (oldBindings == resultState.bindings) {
             stillChanging = false;
         }
+        s = resultState;
     }
-    return result;
+    return s;
 }
 
-string nextUnboundAtom(State s){
+string nextUnboundAtom(State s) {
     vector<string> unbound;
-    for(int i = 0; i < s.clauses.size(); i++){
-        for(int j = 0; j < s.clauses[i].size(); j++){
+    for (int i = 0; i < s.clauses.size(); i++) {
+        for (int j = 0; j < s.clauses[i].size(); j++) {
             string atom = atom_of(s.clauses[i][j]);
-            if(s.bindings.find(atom) == s.bindings.end()){
+            if (s.bindings.find(atom) == s.bindings.end()) {
                 unbound.push_back(atom);
             }
         }
@@ -187,7 +188,8 @@ string stringifyBindings(map<string, bool> bindings) {
     string result;
     for (auto const&[key, val] : bindings) {
         result += key + " ";
-        result += val + "\n";
+        result += val ? "true" : "false";
+        result += "\n";
     }
     return result;
 }
@@ -195,30 +197,33 @@ string stringifyBindings(map<string, bool> bindings) {
 string DPLL(State s) {
     vector<vector<string>> clauses = s.clauses;
     map<string, bool> bindings = s.bindings;
-    if(clauses.size() == 0){
+    if (clauses.size() == 0) { // done! solution found
         return stringifyBindings(bindings);
     }
-    if(containsEmptyClause(clauses)){
+    if (containsEmptyClause(clauses)) {
         return "Fail";
     }
     State easyCasesResult = handleEasyCases(s);
-    if(clauses.size() == 0){
+    clauses = easyCasesResult.clauses;
+    bindings = easyCasesResult.bindings;
+    if (clauses.size() == 0) { // done! solution found
         return stringifyBindings(bindings);
     }
-    if(containsEmptyClause(clauses)){
+    if (containsEmptyClause(clauses)) {
         return "Fail";
     }
-    vector<vector<string>> clausesCopy(clauses);
-    map<string, bool> bindingsCopy(bindings);
-    State stateCopy = State{clausesCopy, bindingsCopy};
-    string unboundAtom = nextUnboundAtom(stateCopy);
-    stateCopy = propagate(stateCopy, unboundAtom, true);
-    string answer = DPLL(stateCopy);
-    if(answer == "Fail"){
-        for(int i = 0; i < atoms.size(); i++){
+//    vector<vector<string>> clausesCopy(clauses);
+//    map<string, bool> bindingsCopy(bindings);
+    State stateCopyTrue = State{clauses, bindings};
+    string unboundAtom = nextUnboundAtom(stateCopyTrue);
+    // see if we find a solution with the unbound atom bound to true
+    stateCopyTrue = propagate(stateCopyTrue, unboundAtom, true);
+    string answer = DPLL(stateCopyTrue);
+    if (answer != "Fail") { // found a solution! just backfill the ones that can be either with true
+        for (int i = 0; i < atoms.size(); i++) {
             string atom = atoms[i];
-            for(int j = 0; j < answer.size(); j++){
-                if(answer[j] == atom[0]){
+            for (int j = 0; j < answer.size(); j++) {
+                if (answer[j] == atom[0]) {
                     break;
                 }
             }
@@ -226,13 +231,10 @@ string DPLL(State s) {
         }
         return answer;
     }
-    stateCopy = propagate(stateCopy, unboundAtom, false);
-    return DPLL(stateCopy);
-
-
-    //line 92
-
-    return DPLL(s);
+    // see if we find a solution with the unbound atom bound to false
+    State stateCopyFalse = State{clauses, bindings};
+    stateCopyFalse = propagate(stateCopyFalse, unboundAtom, false);
+    return DPLL(stateCopyFalse);
 }
 
 void runWithInputFile(string inputFileName) {
@@ -274,7 +276,6 @@ void runWithInputFile(string inputFileName) {
         output = "NO SOLUTION";
     } else {
         output = answer;
-        // '\n'.join([f"{k} {str(v)[0]}" for k, v in sorted(answer.items(), key=lambda i: int(i[0]))]))
     }
 
     // Create and open output file

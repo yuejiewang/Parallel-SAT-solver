@@ -1,4 +1,24 @@
-Fail1 true
+1 true
+10 false
+11 true
+12 false
+13 false
+14 false
+15 false
+16 true
+17 false
+18 true
+19 true
+2 false
+20 true
+3 false
+4 false
+5 false
+6 true
+7 true
+8 false
+9 false
+1 true
 2 true
 3 true
 4 true
@@ -7,6 +27,17 @@ Fail1 true
 7 true
 8 true
 9 true
+10 true
+11 true
+12 true
+13 true
+14 true
+15 true
+16 true
+17 true
+18 true
+19 true
+20 true
 
 1 At(START, 0)
 2 At(A, 0)
