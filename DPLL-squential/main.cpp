@@ -59,12 +59,8 @@ void printClauses(vector<vector<string>> clauses) {
 
 
 string atom_of(string literal) {
-//    string s;
     if (literal[0] == '-') {
         literal.erase(0, 1);
-//        s.push_back(literal[1]);
-//    } else {
-//        s = literal;
     }
     return literal;
 }
@@ -101,7 +97,7 @@ bool containsEmptyClause(vector<vector<string>> clauses) {
 State propagate(State s, string atom, bool value) {
     s.bindings.insert(pair<string, bool>(atom, value));
     string literal, opposite;
-    if (value == true) {
+    if (value) {
         literal = atom;
         opposite = "-" + atom;
     } else {
@@ -127,6 +123,8 @@ State handleEasyCases(State s) {
     bool stillChanging = true;
     while (stillChanging) {
         map<string, bool> oldBindings(s.bindings);
+        cout << "starting with:" << endl;
+        printClauses(s.clauses);
         State resultState = State{s.clauses, s.bindings};
         for (int i = 0; i < s.clauses.size(); i++) {
             vector<string> clause = s.clauses[i];
@@ -171,7 +169,7 @@ string nextUnboundAtom(State s) {
     for (int i = 0; i < s.clauses.size(); i++) {
         for (int j = 0; j < s.clauses[i].size(); j++) {
             string atom = atom_of(s.clauses[i][j]);
-            if (s.bindings.find(atom) == s.bindings.end()) {
+            if (s.bindings.find(atom) == s.bindings.end()) { // atom not in bindings
                 unbound.push_back(atom);
             }
         }
@@ -182,13 +180,27 @@ string nextUnboundAtom(State s) {
 
 string stringifyBindings(map<string, bool> bindings) {
     map<int, bool> intBindings;
+    vector<string> either;
+    for (int i = 0; i < atoms.size(); i++) {
+        string atom = atoms[i];
+        if (bindings.find(atom) == bindings.end()) { // atom not in bindings
+            // add to list "either"
+            either.push_back(atom);
+            // add to bindings with value true
+            bindings.insert(pair<string, bool>(atom, true));
+        }
+    }
     for (auto const&[key, val] : bindings) {
         intBindings.insert(pair<int, bool>(stoi(key), val));
     }
-    string result;
-    for (auto const&[key, val] : bindings) {
-        result += key + " ";
-        result += val ? "true" : "false";
+    string result = "";
+    for (auto const&[key, val] : intBindings) {
+        result += to_string(key) + " ";
+        if (find(either.begin(), either.end(), to_string(key)) != either.end()) {
+            result += "true or false";
+        } else {
+            result += val ? "true" : "false";
+        };
         result += "\n";
     }
     return result;
@@ -220,15 +232,6 @@ string DPLL(State s) {
     stateCopyTrue = propagate(stateCopyTrue, unboundAtom, true);
     string answer = DPLL(stateCopyTrue);
     if (answer != "Fail") { // found a solution! just backfill the ones that can be either with true
-        for (int i = 0; i < atoms.size(); i++) {
-            string atom = atoms[i];
-            for (int j = 0; j < answer.size(); j++) {
-                if (answer[j] == atom[0]) {
-                    break;
-                }
-            }
-            answer += atom + " true\n";
-        }
         return answer;
     }
     // see if we find a solution with the unbound atom bound to false
