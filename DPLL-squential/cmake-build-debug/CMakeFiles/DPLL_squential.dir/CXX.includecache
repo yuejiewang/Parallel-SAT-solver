@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/Nellie/Desktop/Zahran-Multicore/Parallel-SAT-solver/DPLL-squential/main.cpp
+iostream
+-
+string
+-
+map
+-
+vector
+-
+fstream
+-
+sstream
+-
+cctype
+-
+algorithm
+-
+
