@@ -1,0 +1,240 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/ArgParsing.h
+map
+-
+
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Cdcl.cpp
+queue
+-
+Cdcl.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Cdcl.h
+
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Cdcl.h
+unordered_map
+-
+Dpll.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Dpll.h
+CdclDependencyGraph.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/CdclDependencyGraph.h
+Solver.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Solver.h
+
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/CdclDependencyGraph.cpp
+CdclDependencyGraph.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/CdclDependencyGraph.h
+
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/CdclDependencyGraph.h
+unordered_set
+-
+unordered_map
+-
+Variable.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Variable.h
+
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Clause.cpp
+Clause.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Clause.h
+
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Clause.h
+Variable.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Variable.h
+InternalTypes.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/InternalTypes.h
+
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Cnf.cpp
+Cnf.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Cnf.h
+
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Cnf.h
+iostream
+-
+string
+-
+Variable.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Variable.h
+Clause.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Clause.h
+InternalTypes.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/InternalTypes.h
+
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/CnfParser.cpp
+CnfParser.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/CnfParser.h
+Exceptions.cpp
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Exceptions.cpp
+sys/stat.h
+-
+fstream
+-
+sstream
+-
+iostream
+-
+
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/CnfParser.h
+unordered_set
+-
+string
+-
+Variable.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Variable.h
+Clause.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Clause.h
+Cnf.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Cnf.h
+InternalTypes.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/InternalTypes.h
+
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Config.h
+Worker.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Worker.h
+
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Dpll.cpp
+Dpll.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Dpll.h
+
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Dpll.h
+unordered_set
+-
+iostream
+-
+stdexcept
+-
+Solver.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Solver.h
+Cdcl.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Cdcl.h
+Config.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Config.h
+Variable.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Variable.h
+Clause.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Clause.h
+Cnf.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Cnf.h
+Worker.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Worker.h
+InternalTypes.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/InternalTypes.h
+
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Exceptions.cpp
+exception
+-
+string
+-
+
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/InternalTypes.h
+vector
+-
+Clause.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Clause.h
+Variable.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Variable.h
+
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Meter.h
+chrono
+-
+
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/MpiTypes.h
+mpi.h
+-
+
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Solver.h
+Cnf.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Cnf.h
+
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/SolverController.cpp
+SolverController.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/SolverController.h
+
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/SolverController.h
+Solver.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Solver.h
+Cdcl.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Cdcl.h
+
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Variable.cpp
+Variable.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Variable.h
+iostream
+-
+
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Variable.h
+string
+-
+set
+-
+
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Worker.cpp
+Worker.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Worker.h
+
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Worker.h
+stdexcept
+-
+vector
+-
+climits
+-
+Cnf.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Cnf.h
+Dpll.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Dpll.h
+MpiTypes.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/MpiTypes.h
+InternalTypes.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/InternalTypes.h
+Meter.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Meter.h
+
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/sequential_main.cpp
+string
+-
+fstream
+-
+chrono
+-
+map
+-
+Variable.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Variable.h
+Clause.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Clause.h
+Cnf.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Cnf.h
+CnfParser.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/CnfParser.h
+Dpll.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/Dpll.h
+ArgParsing.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/ArgParsing.h
+SolverController.h
+/mnt/d/21 Spring/Multicore Processors/project-parallel SAT solver/SAT-Solver/src/SolverController.h
+
+/usr/include/x86_64-linux-gnu/mpich/mpi.h
+stddef.h
+-
+cstdint
+-
+stdint.h
+-
+mpio.h
+/usr/include/x86_64-linux-gnu/mpich/mpio.h
+mpicxx.h
+/usr/include/x86_64-linux-gnu/mpich/mpicxx.h
+
+/usr/include/x86_64-linux-gnu/mpich/mpicxx.h
+stdio.h
+-
+
+/usr/include/x86_64-linux-gnu/mpich/mpio.h
+mpi.h
+/usr/include/x86_64-linux-gnu/mpich/mpi.h
+

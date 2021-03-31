@@ -1,0 +1,14 @@
+GithubCode/lingeling/plingeling
+GithubCode/lingeling/treengeling
+GithubCode/lingeling/ilingeling
+GithubCode/lingeling/blimc
+
+*.o
+*.a
+*.s
+*.log
+
+GithubCode/SAT-Solver/sequential_main
+GithubCode/SAT-Solver/parallel_main
+GithubCode/SAT-Solver/stealing_main
+GithubCode/SAT-Solver/CMakeCache.txt
