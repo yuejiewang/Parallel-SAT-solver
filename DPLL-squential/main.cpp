@@ -7,7 +7,8 @@
 #include <cctype>
 #include <algorithm>
 #include <iterator>
-
+#include <filesystem>
+namespace fs = std::filesystem;
 
 using namespace std;
 
@@ -262,6 +263,10 @@ void runWithInputFile(string inputFileName) {
     int num_clauses;
     // Read from the text file
     ifstream inputFile(inputFileName);
+//    size_t lastindex = inputFileName.find_last_of(".cnf");
+    string filename = inputFileName.substr(9);
+    filename.erase(filename.find_last_of("."), string::npos);
+
 
     // Use a while loop together with the getline() function to read the file line by line
     cout << "reading: " << inputFileName << endl;
@@ -277,8 +282,8 @@ void runWithInputFile(string inputFileName) {
                 originalClauses.push_back(splitClause(clauseStrings[i]));
         }
     }
-    cout << "Original Clauses: " << endl;
-    printClauses(originalClauses);
+//    cout << "Original Clauses: " << endl;
+//    printClauses(originalClauses);
 
     // Close the file
     inputFile.close();
@@ -296,18 +301,30 @@ void runWithInputFile(string inputFileName) {
     }
 
     // Create and open output file
-    ofstream outputFile("../sequential_dpll_output.txt");
+    ofstream outputFile("../output/sequential_"+filename+"_output.txt");
+    cout << "writing to ../output/sequential_"+filename+"_output.txt" << endl;
 
     // Write to the file
     outputFile << output + "\n";
-    cout << "writing to: sequential_dpll_output.txt" << endl;
 
     // Close the file
     outputFile.close();
 }
 
+void runWithAllInputFiles(){
+    string path = "../input";
+    for (const auto & entry : fs::directory_iterator(path)) {
+        std::cout << "running on input file: " << entry.path() << std::endl;
+        runWithInputFile(entry.path());
+    }
+}
 
-int main() {
-    runWithInputFile("../uf50-0999.cnf");
+
+int main(int argc, char *argv[]) {
+    if(argc == 2){
+        runWithInputFile(argv[0]);
+    } else {
+        runWithAllInputFiles();
+    };
     return 0;
 }
