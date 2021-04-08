@@ -45,9 +45,9 @@ vector<string> splitIntoClauses(string s) {
     trim(s);
     vector<string> clauseList;
     size_t pos0 = 0;
-    while((pos0 = s.find(" 0")) != std::string::npos){
+    while ((pos0 = s.find(" 0")) != std::string::npos) {
         clauseList.push_back(s.substr(0, pos0));
-        s.erase(0, pos0+2);
+        s.erase(0, pos0 + 2);
     }
     return clauseList;
 }
@@ -134,8 +134,8 @@ State handleEasyCases(State s) {
     bool stillChanging = true;
     while (stillChanging) {
         map<string, bool> oldBindings(s.bindings);
-//        cout << "starting with:" << endl;
-//        printClauses(s.clauses);
+        cout << "starting with " << s.clauses.size() << " clauses: " << endl;
+        printClauses(s.clauses);
         State resultState = State{s.clauses, s.bindings};
         for (int i = 0; i < s.clauses.size(); i++) {
             vector<string> clause = s.clauses[i];
@@ -264,13 +264,13 @@ void runWithInputFile(string inputFileName) {
     cout << "reading: " << inputFileName << endl;
     while (getline(inputFile, line)) {
         // Output the text from the file
-        if (line[0] == 'p'){
+        if (line[0] == 'p') {
             problem_type = line[2];
             num_variables = (int) line[4];
             num_clauses = (int) line[6];
         } else if (line[0] != 'c') {
             vector<string> clauseStrings = splitIntoClauses(line);
-            for(int i = 0; i < clauseStrings.size(); i++)
+            for (int i = 0; i < clauseStrings.size(); i++)
                 originalClauses.push_back(splitClause(clauseStrings[i]));
         }
     }
@@ -305,6 +305,6 @@ void runWithInputFile(string inputFileName) {
 
 
 int main() {
-    runWithInputFile("../aim-100-1_6-no-1.cnf");
+    runWithInputFile("../dpll_input.cnf");
     return 0;
 }
