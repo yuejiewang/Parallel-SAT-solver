@@ -12,3 +12,9 @@ GithubCode/SAT-Solver/sequential_main
 GithubCode/SAT-Solver/parallel_main
 GithubCode/SAT-Solver/stealing_main
 GithubCode/SAT-Solver/CMakeCache.txt
+GithubCode/SAT-Solver/cmake_install.cmake
+GithubCode/SAT-Solver/CMakeFiles*
+GithubCode/SAT-Solver/cnfs*
+GithubCode/SAT-Solver/report*
+GithubCode/SAT-Solver/results*
+

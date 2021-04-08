@@ -1,5 +1,0 @@
-/mnt/d/21Spring/MulticoreProcessors/Project_parallel-SAT-solver/Parallel-SAT-solver/GithubCode/SAT-Solver/CMakeFiles/rebuild_cache.dir
-/mnt/d/21Spring/MulticoreProcessors/Project_parallel-SAT-solver/Parallel-SAT-solver/GithubCode/SAT-Solver/CMakeFiles/edit_cache.dir
-/mnt/d/21Spring/MulticoreProcessors/Project_parallel-SAT-solver/Parallel-SAT-solver/GithubCode/SAT-Solver/CMakeFiles/stealing_main.dir
-/mnt/d/21Spring/MulticoreProcessors/Project_parallel-SAT-solver/Parallel-SAT-solver/GithubCode/SAT-Solver/CMakeFiles/parallel_main.dir
-/mnt/d/21Spring/MulticoreProcessors/Project_parallel-SAT-solver/Parallel-SAT-solver/GithubCode/SAT-Solver/CMakeFiles/sequential_main.dir
