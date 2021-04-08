@@ -322,7 +322,7 @@ void runWithAllInputFiles(){
 
 int main(int argc, char *argv[]) {
     if(argc == 2){
-        runWithInputFile(argv[0]);
+        runWithInputFile(argv[1]);
     } else {
         runWithAllInputFiles();
     };
