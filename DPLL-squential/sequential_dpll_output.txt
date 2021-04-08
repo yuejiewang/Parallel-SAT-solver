@@ -1,0 +1,41 @@
+1 true
+2 false
+3 false
+4 false
+5 false
+6 true
+7 true
+8 false
+9 false
+10 false
+11 true
+12 false
+13 false
+14 false
+15 false
+16 true
+17 false
+18 true
+19 true
+20 true
+
+1 At(START, 0)
+2 At(A, 0)
+3 At(B, 0)
+4 At(START, 1)
+5 At(A, 1)
+6 At(B, 1)
+7 At(START, 2)
+8 At(A, 2)
+9 At(B, 2)
+10 At(START, 3)
+11 At(A, 3)
+12 At(B, 3)
+13 Has(GOLD, 0)
+14 Has(WAND, 0)
+15 Has(GOLD, 1)
+16 Has(WAND, 1)
+17 Has(GOLD, 2)
+18 Has(WAND, 2)
+19 Has(GOLD, 3)
+20 Has(WAND, 3)
