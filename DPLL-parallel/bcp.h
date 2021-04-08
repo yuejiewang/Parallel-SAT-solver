@@ -25,7 +25,8 @@ struct bitmap {
 		if (idx >= maxlen * 8 || idx < 0) return 0;
 		size_t hi = idx >> 3, lo = idx & 0x07;  // hi = idx / 8, lo = idx % 8
 		unsigned char d = raw[hi];
-		d &= (0x01 << lo);
+		d = d >> lo;
+		d &= 0x01;
 		return (int)d;
 	}
 	void set(int idx, int val) {
@@ -52,10 +53,10 @@ typedef struct cnf_type CNF_TYPE;
 typedef string CNF_NAIVE;
 
 struct node_t {
-	BITMAP_NAIVE dec;
-	BITMAP_NAIVE val;
+	BITMAP dec;
+	BITMAP val;
 	CNF_NAIVE cnf;
-	node_t(BITMAP_NAIVE _d, BITMAP_NAIVE _v, CNF_NAIVE _c): dec(_d), val(_v), cnf(_c) {}
+	node_t(BITMAP _d, BITMAP _v, CNF_NAIVE _c): dec(_d), val(_v), cnf(_c) {}
 };
 typedef struct node_t Node;
 
