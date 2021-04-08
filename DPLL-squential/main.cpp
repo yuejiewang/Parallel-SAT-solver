@@ -49,6 +49,9 @@ vector<string> splitIntoClauses(string s) {
         clauseList.push_back(s.substr(0, pos0));
         s.erase(0, pos0 + 2);
     }
+    if(s.size() != 0){
+        clauseList.push_back(s);
+    }
     return clauseList;
 }
 
@@ -134,8 +137,8 @@ State handleEasyCases(State s) {
     bool stillChanging = true;
     while (stillChanging) {
         map<string, bool> oldBindings(s.bindings);
-        cout << "starting with " << s.clauses.size() << " clauses: " << endl;
-        printClauses(s.clauses);
+//        cout << "starting with " << s.clauses.size() << " clauses: " << endl;
+//        printClauses(s.clauses);
         State resultState = State{s.clauses, s.bindings};
         for (int i = 0; i < s.clauses.size(); i++) {
             vector<string> clause = s.clauses[i];
@@ -268,7 +271,7 @@ void runWithInputFile(string inputFileName) {
             problem_type = line[2];
             num_variables = (int) line[4];
             num_clauses = (int) line[6];
-        } else if (line[0] != 'c') {
+        } else if (line[0] != 'c' && isnumber(line[0])) {
             vector<string> clauseStrings = splitIntoClauses(line);
             for (int i = 0; i < clauseStrings.size(); i++)
                 originalClauses.push_back(splitClause(clauseStrings[i]));
@@ -305,6 +308,6 @@ void runWithInputFile(string inputFileName) {
 
 
 int main() {
-    runWithInputFile("../dpll_input.cnf");
+    runWithInputFile("../uf50-0999.cnf");
     return 0;
 }
