@@ -8,6 +8,7 @@ GithubCode/lingeling/blimc
 *.s
 *.log
 
+GithubCode*
 GithubCode/SAT-Solver/sequential_main
 GithubCode/SAT-Solver/parallel_main
 GithubCode/SAT-Solver/stealing_main
