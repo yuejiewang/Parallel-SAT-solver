@@ -6,6 +6,8 @@
 #include <sstream>
 #include <cctype>
 #include <algorithm>
+#include <iterator>
+
 
 using namespace std;
 
@@ -31,7 +33,6 @@ static inline void trim(std::string &s) {
 }
 
 
-string key = "";
 vector<vector<string>> originalClauses;
 vector<string> atoms;
 
@@ -40,6 +41,16 @@ struct State {
     map<string, bool> bindings;
 };
 
+vector<string> splitIntoClauses(string s) {
+    trim(s);
+    vector<string> clauseList;
+    size_t pos0 = 0;
+    while((pos0 = s.find(" 0")) != std::string::npos){
+        clauseList.push_back(s.substr(0, pos0));
+        s.erase(0, pos0+2);
+    }
+    return clauseList;
+}
 
 vector<string> splitClause(string s) {
     trim(s);
@@ -123,8 +134,8 @@ State handleEasyCases(State s) {
     bool stillChanging = true;
     while (stillChanging) {
         map<string, bool> oldBindings(s.bindings);
-        cout << "starting with:" << endl;
-        printClauses(s.clauses);
+//        cout << "starting with:" << endl;
+//        printClauses(s.clauses);
         State resultState = State{s.clauses, s.bindings};
         for (int i = 0; i < s.clauses.size(); i++) {
             vector<string> clause = s.clauses[i];
@@ -243,28 +254,28 @@ string DPLL(State s) {
 void runWithInputFile(string inputFileName) {
     // Create a text string, which is used to output the text file
     string line;
-
+    string problem_type;
+    int num_variables;
+    int num_clauses;
     // Read from the text file
     ifstream inputFile(inputFileName);
 
     // Use a while loop together with the getline() function to read the file line by line
     cout << "reading: " << inputFileName << endl;
-    bool clauseMode = true;
     while (getline(inputFile, line)) {
         // Output the text from the file
-        if (clauseMode == false) {
-            key += line + "\n";
-        } else if (line.compare("0") != 0 && clauseMode) {
-            originalClauses.push_back(splitClause(line));
-        } else {
-            clauseMode = false;
-            continue;
+        if (line[0] == 'p'){
+            problem_type = line[2];
+            num_variables = (int) line[4];
+            num_clauses = (int) line[6];
+        } else if (line[0] != 'c') {
+            vector<string> clauseStrings = splitIntoClauses(line);
+            for(int i = 0; i < clauseStrings.size(); i++)
+                originalClauses.push_back(splitClause(clauseStrings[i]));
         }
-
     }
     cout << "Original Clauses: " << endl;
     printClauses(originalClauses);
-    cout << "Key:\n" + key << endl;
 
     // Close the file
     inputFile.close();
@@ -285,7 +296,7 @@ void runWithInputFile(string inputFileName) {
     ofstream outputFile("../sequential_dpll_output.txt");
 
     // Write to the file
-    outputFile << output + "\n" + key;
+    outputFile << output + "\n";
     cout << "writing to: sequential_dpll_output.txt" << endl;
 
     // Close the file
@@ -294,6 +305,6 @@ void runWithInputFile(string inputFileName) {
 
 
 int main() {
-    runWithInputFile("../dpll_input.txt");
+    runWithInputFile("../aim-100-1_6-no-1.cnf");
     return 0;
 }
