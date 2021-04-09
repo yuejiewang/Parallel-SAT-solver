@@ -133,6 +133,26 @@ struct node_t {
 		if (cnf.empty()) return 1;  // branch sat
 		return 0;  // branch not finished
 	}
+	string to_string() {
+		string str = "";
+		stringstream ss1;
+		for (int i = 0; i < dec.rawlen; i++) ss1 << dec.get(i);
+		string tmp1 = "";
+		ss1 >> tmp1;
+		str = tmp1 + "/";
+		stringstream ss2;
+		for (int i = 0; i < val.rawlen; i++) ss2 << val.get(i);
+		string tmp2 = "";
+		ss2 >> tmp2;
+		str = str + tmp2 + "\n";
+		for (CNF_T::iterator ii = cnf.begin(); ii != cnf.end(); ii++) {
+			for (CLAUSE_T::iterator ij = (*ii).begin(); ij != (*ii).end(); ij++) {
+				str = str + *ij + " ";
+			}
+			str += "\n";
+		}
+		return str;
+	}
 };
 typedef struct node_t Node;
 
