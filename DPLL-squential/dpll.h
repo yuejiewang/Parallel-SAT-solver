@@ -1,12 +1,6 @@
-#include <iostream>
 #include <string>
 #include <map>
 #include <vector>
-#include <fstream>
-#include <sstream>
-#include <cctype>
-#include <algorithm>
-#include <iterator>
 
 #ifndef DPLL_SQUENTIAL_DPLL_H
 #define DPLL_SQUENTIAL_DPLL_H

@@ -1,17 +1,12 @@
 #include <iostream>
 #include <string>
-#include <map>
 #include <vector>
-#include <fstream>
-#include <sstream>
 #include <cctype>
 #include <algorithm>
 #include <iterator>
-#include <filesystem>
 #include "inputReader.h"
 #include "dpll.h"
 
-namespace fs = std::filesystem;
 using namespace std;
 
 

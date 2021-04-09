@@ -14,10 +14,8 @@ namespace fs = std::filesystem;
 
 using namespace std;
 
-
-vector<vector<string>> originalClauses;
-
 void runWithInputFile(string inputFileName) {
+    vector<vector<string>> originalClauses;
     // Create a text string, which is used to output the text file
     string line;
     string problem_type;
@@ -86,6 +84,6 @@ int main(int argc, char *argv[]) {
         runWithInputFile(argv[1]);
     } else {
         runWithAllInputFiles();
-    };
+    }
     return 0;
 }

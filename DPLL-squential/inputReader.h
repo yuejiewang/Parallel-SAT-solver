@@ -1,12 +1,8 @@
-#include <iostream>
 #include <string>
 #include <map>
 #include <vector>
 #include <fstream>
 #include <sstream>
-#include <cctype>
-#include <algorithm>
-#include <iterator>
 using namespace std;
 
 #ifndef DPLL_SQUENTIAL_INPUTREADER_H

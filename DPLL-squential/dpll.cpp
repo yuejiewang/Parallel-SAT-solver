@@ -1,12 +1,7 @@
-#include <iostream>
 #include <string>
 #include <map>
 #include <vector>
-#include <fstream>
-#include <sstream>
-#include <cctype>
 #include <algorithm>
-#include <iterator>
 #include "dpll.h"
 
 using namespace std;
@@ -143,7 +138,6 @@ string stringifyBindings(map<string, bool> bindings, vector<string> atoms) {
     }
     return result;
 }
-
 
 string DPLL(State s, vector<string> atoms) {
     vector<vector<string>> clauses = s.clauses;
