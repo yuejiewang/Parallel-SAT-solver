@@ -20,11 +20,35 @@
 #include"dpll.h"
 #include"inputReader.h"
 using namespace std;
-static const int NTHREADS = 4;
-static const int POW = 2;
+static const int NTHREADS = 16;
+static const int POW = 4;
 typedef vector<string> CLAUSE;
 typedef vector<CLAUSE> CNF;
 typedef map<string, bool> BIND;
+string toString(BIND b, vector<string> a) {
+	map<int, string> bmap;
+	string str = "";
+	for (size_t j = 0; j < a.size(); j++) {
+		string atom = a[j];
+		if (b.find(atom) != b.end()) {
+			if (b[atom] == false) bmap[stoi(atom)] = "-" + atom;
+			else bmap[stoi(atom)] = atom;
+		} else {
+			bmap[stoi(atom)] = "/" + atom;
+		}
+		/*
+		if (b.find(atom) == b.end()) {
+			bmap[stoi(atom)] = atom;
+		}
+		*/
+	}
+	for (auto const&[key, val] : bmap) {
+		str += val;
+		str += " ";
+	}
+	str += "\n";
+	return str;
+}
 int main(int argc, char* argv[])
 {
 	CNF originalClauses;
@@ -37,12 +61,14 @@ int main(int argc, char* argv[])
 	filename.erase(filename.find_last_of("."), string::npos);
 
 	while (getline(inputFile, line)) {
+		line.erase(0, line.find_first_not_of(" \n\t"));
 		if (line[0] == 'p') {
 			problem_type = line[2];
 			num_variables = (int)line[4];
 			num_clauses = (int)line[6];
-		}
-		else if (line[0] != 'c' && (isdigit(line[0]) || line[0] == '-')) {
+		} else if (line[0] == 'c') {
+			continue;
+		} else if (isdigit(line[0]) || line[0] == '-') {
 			CLAUSE clauseStrings = splitIntoClauses(line);
 			for (int i = 0; i < clauseStrings.size(); i++)
 				originalClauses.push_back(splitClause(clauseStrings[i]));
@@ -53,7 +79,6 @@ int main(int argc, char* argv[])
 	list<State*> local_stack[NTHREADS];
 	vector<State> sat[NTHREADS];
 
-	// Run the actual DPLL algorithm
 	vector<string> atoms = makeAtomList(originalClauses);
 	BIND b;
 	State original = State{ originalClauses, b };
@@ -82,6 +107,8 @@ int main(int argc, char* argv[])
 				sat[tid].push_back(*root);
 			} else if (containsEmptyClause(root->clauses)) end_flag = 2;
 			do {
+				if (end_flag) break;
+				
 				*root = handleEasyCases(*root);
 				if (root->clauses.empty()) {
 					end_flag = 1;
@@ -120,13 +147,10 @@ int main(int argc, char* argv[])
 					}
 				}
 				if (end_flag) break;
-//				node->dec.set(0, 1);
-//				node->dec.set(1, 1);
-//				node->val.set(0, tid & 0x1);
-//				node->val.set(1, (tid >> 1) & 0x1);
 
 				State* current_state = root;  // subtree traversal for this thread
 				while (current_state) {
+//					cout << "----- thread " + tid_str + " -----\n" + toString(current_state->bindings, atoms);
 					if (current_state->clauses.empty()) {
 						end_flag = 1;
 						sat[tid].push_back(*current_state);
@@ -135,11 +159,13 @@ int main(int argc, char* argv[])
 					if (containsEmptyClause(current_state->clauses)) {
 						if (local_stack[tid].empty()) {
 							end_flag = 2;
+							cout << "thread " + tid_str + " UNSAT\n" << endl;
 							break;
 						}  // case UNSAT for this thread
 						current_state = local_stack[tid].back();
 						local_stack[tid].pop_back();
 					}  // current branch UNSAT, pop local stack if not empty
+
 					*current_state = handleEasyCases(*current_state);
 					if (current_state->clauses.empty()) {
 						end_flag = 1;
@@ -149,6 +175,7 @@ int main(int argc, char* argv[])
 					if (containsEmptyClause(current_state->clauses)) {
 						if (local_stack[tid].empty()) {
 							end_flag = 2;
+							cout << "thread " + tid_str + " UNSAT\n";
 							break;
 						}  // case UNSAT for this thread
 						current_state = local_stack[tid].back();
@@ -158,70 +185,21 @@ int main(int argc, char* argv[])
 					State copy = *current_state;
 					string split = nextUnboundAtom(copy);
 					State* lstate = new State;
-					*lstate = propagate(copy, split, true);
+					*lstate = propagate(copy, split, false);
 					State* rstate = new State;
-					*rstate = propagate(copy, split, false);
+					*rstate = propagate(copy, split, true);
 					current_state = lstate;
 					local_stack[tid].push_back(rstate);
 				}
-
-				/*
-				Node* current_node = node;
-				while (current_node != NULL) {
-					stringstream ss_tid;
-					ss_tid << tid;
-					string tid_str;
-					ss_tid >> tid_str;
-					cout << ("----- " + tid_str + " -----\n" + current_node->to_string());
-					CNF_T lcnf, rcnf;
-					Node* lc = new Node(current_node->dec, current_node->val, lcnf);
-					Node* rc = new Node(current_node->dec, current_node->val, rcnf);
-					int flag = fake_propagation(current_node, lc, rc);
-					switch (flag) {
-					case 0:
-						current_node = lc;
-						local_stack[tid].push_back(rc);
-						break;
-					case 1:
-						break;
-					case 2:
-						current_node = NULL;
-						if (!local_stack[tid].empty()) {
-							current_node = local_stack[tid].back();
-							local_stack[tid].pop_back();
-						}
-						break;
-					default:
-						current_node = NULL;
-						break;
-					}
-					if (flag == 1) break;
-				}
-				if (current_node != NULL) {
-					for (int i = 0; i < current_node->dec.rawlen; i++) {
-						stringstream ss;
-						ss << (i + 1);
-						string str;
-						ss >> str;
-						if (current_node->dec.get(i) && current_node->val.get(i)) {
-							str = "<" + str + " 1> ";
-						}
-						else if (current_node->dec.get(i) && !current_node->val.get(i)) {
-							str = "<" + str + " 0> ";
-						}
-						else str = "<" + str + " X> ";
-						sat[tid].push_back(str);
-					}
-				}
-				*/
-			} while(0);
+			}while(0);
 		}
 	}
 
 	int satFlag = 0;
 	for (int i = 0; i < NTHREADS; i++) {
 		if (!sat[i].empty()) {
-			cout << stringifyBindings(sat[i][0].bindings, atoms);
+			string outstr = toString(sat[i][0].bindings, atoms);
+			cout << outstr;
 			satFlag = 1;
 			break;
 		}
