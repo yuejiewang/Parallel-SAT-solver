@@ -20,8 +20,8 @@
 #include"dpll.h"
 #include"inputReader.h"
 using namespace std;
-static const int NTHREADS = 16;
-static const int POW = 4;
+static const int NTHREADS = 64;
+static const int POW = 6;
 typedef vector<string> CLAUSE;
 typedef vector<CLAUSE> CNF;
 typedef map<string, bool> BIND;
@@ -36,15 +36,10 @@ string toString(BIND b, vector<string> a) {
 		} else {
 			bmap[stoi(atom)] = "/" + atom;
 		}
-		/*
-		if (b.find(atom) == b.end()) {
-			bmap[stoi(atom)] = atom;
-		}
-		*/
 	}
 	for (auto const&[key, val] : bmap) {
 		str += val;
-		str += " ";
+		str += "\n";
 	}
 	str += "\n";
 	return str;
@@ -81,7 +76,7 @@ int main(int argc, char* argv[])
 
 	vector<string> atoms = makeAtomList(originalClauses);
 	BIND b;
-	State original = State{ originalClauses, b };
+	State original = State{ false, originalClauses, b };
 	// Push the root State into each local stack
 	for (int i = 0; i < NTHREADS; i++) {
 		State* rootCopy = new State;
@@ -126,23 +121,23 @@ int main(int argc, char* argv[])
 					string split = nextUnboundAtom(*root);
 					bool value = (bool)((tid >> p) & 0x1);
 					*root = propagate(*root, split, value);
+					if (root->conflict) {
+						end_flag = 2;
+						break;
+					}
 					if (root->clauses.empty()) {
 						end_flag = 1;
 						sat[tid].push_back(*root);
-						break;
-					}
-					if (containsEmptyClause(root->clauses)) {
-						end_flag = 2;
 						break;
 					}
 					*root = handleEasyCases(*root);
+					if (root->conflict) {
+						end_flag = 2;
+						break;
+					}
 					if (root->clauses.empty()) {
 						end_flag = 1;
 						sat[tid].push_back(*root);
-						break;
-					}
-					if (containsEmptyClause(root->clauses)) {
-						end_flag = 2;
 						break;
 					}
 				}
@@ -150,37 +145,38 @@ int main(int argc, char* argv[])
 
 				State* current_state = root;  // subtree traversal for this thread
 				while (current_state) {
-//					cout << "----- thread " + tid_str + " -----\n" + toString(current_state->bindings, atoms);
+					if (current_state->conflict) {
+						if (local_stack[tid].empty()) {
+							end_flag = 2;
+							break;
+						}  // case UNSAT for this thread
+						delete current_state;
+						current_state = local_stack[tid].back();
+						local_stack[tid].pop_back();
+						continue;
+					}  // current branch UNSAT, pop local stack if not empty
 					if (current_state->clauses.empty()) {
 						end_flag = 1;
 						sat[tid].push_back(*current_state);
 						break;
 					}  // case SAT for this thread
-					if (containsEmptyClause(current_state->clauses)) {
-						if (local_stack[tid].empty()) {
-							end_flag = 2;
-							cout << "thread " + tid_str + " UNSAT\n" << endl;
-							break;
-						}  // case UNSAT for this thread
-						current_state = local_stack[tid].back();
-						local_stack[tid].pop_back();
-					}  // current branch UNSAT, pop local stack if not empty
 
 					*current_state = handleEasyCases(*current_state);
+					if (current_state->conflict) {
+						if (local_stack[tid].empty()) {
+							end_flag = 2;
+							break;
+						}  // case UNSAT for this thread
+						delete current_state;
+						current_state = local_stack[tid].back();
+						local_stack[tid].pop_back();
+						continue;
+					}  // current branch UNSAT, pop local stack if not empty
 					if (current_state->clauses.empty()) {
 						end_flag = 1;
 						sat[tid].push_back(*current_state);
 						break;
 					}  // case SAT for this thread
-					if (containsEmptyClause(current_state->clauses)) {
-						if (local_stack[tid].empty()) {
-							end_flag = 2;
-							cout << "thread " + tid_str + " UNSAT\n";
-							break;
-						}  // case UNSAT for this thread
-						current_state = local_stack[tid].back();
-						local_stack[tid].pop_back();
-					}  // current branch UNSAT, pop local stack if not empty
 					// split current node, go to left child and push right child
 					State copy = *current_state;
 					string split = nextUnboundAtom(copy);
@@ -188,6 +184,7 @@ int main(int argc, char* argv[])
 					*lstate = propagate(copy, split, false);
 					State* rstate = new State;
 					*rstate = propagate(copy, split, true);
+					delete current_state;
 					current_state = lstate;
 					local_stack[tid].push_back(rstate);
 				}

@@ -28,8 +28,20 @@ bool containsEmptyClause(vector<vector<string>> clauses) {
 }
 
 State propagate(State s, string atom, bool value) {
+	if (s.conflict) {
+		return s;
+	}
+	if (s.clauses.empty()) {
+		return s;
+	}
+	if (containsEmptyClause(s.clauses)) {
+		s.conflict = true;
+		return s;
+	}
+	
     s.bindings.insert(pair<string, bool>(atom, value));
     string literal, opposite;
+	bool conflict = false;
     if (value) {
         literal = atom;
         opposite = "-" + atom;
@@ -44,23 +56,31 @@ State propagate(State s, string atom, bool value) {
         if (oppIndex != clause.end()) { // if opposite in clause
             clause.erase(oppIndex);
         }
+		if (clause.empty()) {
+			conflict = true;
+			break;
+		}
         auto litIndex = find(clause.begin(), clause.end(), literal);
         if (litIndex == clause.end()) { // if literal is not in clause
             result_clauses.push_back(clause);
         }
     }
-    return State{result_clauses, s.bindings};
+    return State{conflict, result_clauses, s.bindings};
 }
 
 State handleEasyCases(State s) {
     bool stillChanging = true;
-    while (stillChanging) {
+    while (stillChanging && !s.conflict) {
         map<string, bool> oldBindings(s.bindings);
 //        cout << "starting with " << s.clauses.size() << " clauses: " << endl;
 //        printClauses(s.clauses);
-        State resultState = State{s.clauses, s.bindings};
+        State resultState = State{s.conflict, s.clauses, s.bindings};
         for (int i = 0; i < s.clauses.size(); i++) {
             vector<string> clause = s.clauses[i];
+			if (clause.size() == 0) {
+				resultState.conflict = true;
+				return resultState;
+			}
             if (clause.size() == 1) { // case 1: singleton clause
                 string literal = clause[0];
                 resultState = propagate(resultState, atom_of(literal), value_of(literal));
@@ -109,66 +129,4 @@ string nextUnboundAtom(State s) {
     }
     sort(unbound.begin(), unbound.end());
     return unbound[0];
-}
-
-string stringifyBindings(map<string, bool> bindings, vector<string> atoms) {
-    map<int, bool> intBindings;
-    vector<string> either;
-    for (int i = 0; i < atoms.size(); i++) {
-        string atom = atoms[i];
-        if (bindings.find(atom) == bindings.end()) { // atom not in bindings
-            // add to list "either"
-            either.push_back(atom);
-            // add to bindings with value true
-            bindings.insert(pair<string, bool>(atom, true));
-        }
-    }
-    for (auto const&[key, val] : bindings) {
-        intBindings.insert(pair<int, bool>(stoi(key), val));
-    }
-    string result = "";
-    for (auto const&[key, val] : intBindings) {
-        result += to_string(key) + " ";
-        if (find(either.begin(), either.end(), to_string(key)) != either.end()) {
-            result += "true or false";
-        } else {
-            result += val ? "true" : "false";
-        };
-        result += "\n";
-    }
-    return result;
-}
-
-string DPLL(State s, vector<string> atoms) {
-    vector<vector<string>> clauses = s.clauses;
-    map<string, bool> bindings = s.bindings;
-    if (clauses.size() == 0) { // done! solution found
-        return stringifyBindings(bindings, atoms);
-    }
-    if (containsEmptyClause(clauses)) {
-        return "Fail";
-    }
-    State easyCasesResult = handleEasyCases(s);
-    clauses = easyCasesResult.clauses;
-    bindings = easyCasesResult.bindings;
-    if (clauses.size() == 0) { // done! solution found
-        return stringifyBindings(bindings, atoms);
-    }
-    if (containsEmptyClause(clauses)) {
-        return "Fail";
-    }
-//    vector<vector<string>> clausesCopy(clauses);
-//    map<string, bool> bindingsCopy(bindings);
-    State stateCopyTrue = State{clauses, bindings};
-    string unboundAtom = nextUnboundAtom(stateCopyTrue);
-    // see if we find a solution with the unbound atom bound to true
-    stateCopyTrue = propagate(stateCopyTrue, unboundAtom, true);
-    string answer = DPLL(stateCopyTrue, atoms);
-    if (answer != "Fail") { // found a solution! just backfill the ones that can be either with true
-        return answer;
-    }
-    // see if we find a solution with the unbound atom bound to false
-    State stateCopyFalse = State{clauses, bindings};
-    stateCopyFalse = propagate(stateCopyFalse, unboundAtom, false);
-    return DPLL(stateCopyFalse, atoms);
 }
