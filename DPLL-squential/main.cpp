@@ -35,7 +35,7 @@ void runWithInputFile(string inputFileName) {
             problem_type = line[2];
             num_variables = (int) line[4];
             num_clauses = (int) line[6];
-        } else if (line[0] != 'c' && (isnumber(line[0]) || line[0] == '-')) {
+        } else if (line[0] != 'c' && (isdigit(line[0]) || line[0] == '-')) {
             vector<string> clauseStrings = splitIntoClauses(line);
             for (int i = 0; i < clauseStrings.size(); i++)
                 originalClauses.push_back(splitClause(clauseStrings[i]));

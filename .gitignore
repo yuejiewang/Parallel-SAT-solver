@@ -15,4 +15,9 @@ GithubCode/SAT-Solver/stealing_main
 GithubCode/SAT-Solver/CMakeCache.txt
 
 DPLL-parallel/dpll-parallel
+DPLL-parallel/dpll-naive-parallel
+DPLL-parallel/input*
+DPLL-parallel/output*
 DPLL-parallel/test*
+
+output*
