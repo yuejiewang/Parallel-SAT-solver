@@ -17,8 +17,8 @@
 #include<sstream>
 #include<omp.h>
 #include<fstream>
-#include"dpll.h"
-#include"inputReader.h"
+#include"../utils/dpll.h"
+#include"../utils/inputReader.h"
 using namespace std;
 static const int NTHREADS = 64;
 static const int POW = 6;

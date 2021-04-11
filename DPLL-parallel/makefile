@@ -1,8 +1,6 @@
-dpll-parallel: dpll.h dpll.cpp inputReader.h inputReader.cpp dpll-parallel-main.cpp
-	g++ -g -fopenmp -Wall -o dpll-parallel inputReader.cpp dpll.cpp dpll-parallel-main.cpp
-
-dpll-naive-parallel: bcp.h naive-main.cpp
-	g++ -g -fopenmp -Wall -o dpll-naive-parallel naive-main.cpp
+CFLAGS = -g -fopenmp -Wall
+dpll-parallel: ../utils/dpll.o ../utils/inputReader.o dpll-parallel-main.cpp
+	g++ ${CFLAGS} -o dpll-parallel dpll-parallel-main.cpp ../utils/dpll.o ../utils/inputReader.o
 
 clean:
-	rm -f dpll-parallel dpll-naive-parallel
+	rm -f dpll-parallel
