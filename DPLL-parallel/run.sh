@@ -13,6 +13,6 @@ do
 	filename=${file%.*}
 	filename=${filename##*/}
 	./dpll-parallel $file > ./output/$filename.txt
-	echo "testcase ${filename}: "
+	echo "------------ ${filename}"
 	python3 check_sat.py -c input/$filename.cnf -o $filename.txt
 done

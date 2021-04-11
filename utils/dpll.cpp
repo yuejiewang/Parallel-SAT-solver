@@ -34,7 +34,7 @@ State propagate(State s, string atom, bool value) {
 	if (s.clauses.empty()) {
 		return s;
 	}
-	if (containsEmptyClause(s.clauses)) {
+	if (containsEmptyClause(s.clauses) || atom == "") {
 		s.conflict = true;
 		return s;
 	}
@@ -127,6 +127,7 @@ string nextUnboundAtom(State s) {
             }
         }
     }
+	if (unbound.empty()) return "";
     sort(unbound.begin(), unbound.end());
     return unbound[0];
 }

@@ -1,4 +1,4 @@
-CFLAGS = -g -fopenmp -Wall
+CFLAGS = -g -fopenmp -Wall -std=c++17
 dpll-parallel: ../utils/dpll.o ../utils/inputReader.o dpll-parallel-main.cpp
 	g++ ${CFLAGS} -o dpll-parallel dpll-parallel-main.cpp ../utils/dpll.o ../utils/inputReader.o
 
