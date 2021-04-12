@@ -8,10 +8,11 @@ Pseudo code for the algorithm design is in pseudocode.txt (need update).
 
 ## Compile
 ```
-make dpll-parallel [FPOW=pow]
+make dpll-parallel [FPOW=pow] [FV=v]
 ```
 `pow` is a non-negative int and thread number will be set to 2^pow  
-**default:** pow=3 and thread_number=8  
+`v` is either 0 or 1, meaning verbose output for debugging  
+**default:** pow = 3 and thread_number = 8, v = 0  
 
 * Clean up
 ```
@@ -26,10 +27,10 @@ Run parallel DPLL with input file `TEST.cnf`
 **OR**  
 store `TEST.cnf` under `input/` or `large_input/` and run shell scripts:  
 ```
-./run.sh [-p pow]
-./run_large.sh [-p pow]  
+./run.sh [-p pow] [-v]
+./run_large.sh [-p pow] [-v]  
 ```
-`pow` is defined the same as in makefile, default pow is 3  
+`pow` and `v` are defined the same as in makefile
 
 ## Output format
 
@@ -46,9 +47,9 @@ python3 check_sat.py -i INPUT.cnf -o OUTPUT.txt
 ```
 ## Current test cases and performance: 
 
-Input files with prefix `sat_` are satisfiable and others with prefix `unsat_` are unsatisfiable.  
-`input\`: tests that return within a few seconds  
-`large_input\`: tests that could run for several minutes  
+Input files with prefix `sat_` are satisfiable and others with prefix `unsat_` are unsatisfiable.
+`input\`: tests that return within a few seconds
+`large_input\`: tests that could run for several minutes
 
 # TODO
 

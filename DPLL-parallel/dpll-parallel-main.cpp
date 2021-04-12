@@ -27,6 +27,7 @@ using namespace std;
 
 //static const int NTHREADS = 16;
 //static const int POW = 4;
+//static const bool VFLAG = false;
 typedef vector<string> CLAUSE;
 typedef vector<CLAUSE> CNF;
 typedef map<string, bool> BIND;
@@ -247,9 +248,11 @@ int main(int argc, char* argv[])
 				int busy = getBusyThread();
 				if (busy != -1) {
 					root = loadShare(busy);
-					omp_set_lock(&iolock);
-					cout << "# thread " << tid << " takes from thread " << busy << endl;
-					omp_unset_lock(&iolock);
+					if (VFLAG) {
+						omp_set_lock(&iolock);
+						cout << "# thread " << tid << " takes from thread " << busy << endl;
+						omp_unset_lock(&iolock);
+					}
 				}
 			}
 
@@ -265,9 +268,11 @@ int main(int argc, char* argv[])
 						int busy = getBusyThread();
 						if (busy != -1) {
 							current_state = loadShare(busy);
-							omp_set_lock(&iolock);
-							cout << "# thread " << tid << " takes from thread " << busy << endl;
-							omp_unset_lock(&iolock);
+							if (VFLAG) {
+								omp_set_lock(&iolock);
+								cout << "# thread " << tid << " takes from thread " << busy << endl;
+								omp_unset_lock(&iolock);
+							}
 						}
 						continue;
 					}  // case UNSAT for this thread
@@ -307,9 +312,11 @@ int main(int argc, char* argv[])
 						int busy = getBusyThread();
 						if (busy != -1) {
 							current_state = loadShare(busy);
-							omp_set_lock(&iolock);
-							cout << "# thread " << tid << " takes from thread " << busy << endl;
-							omp_unset_lock(&iolock);
+							if (VFLAG) {
+								omp_set_lock(&iolock);
+								cout << "# thread " << tid << " takes from thread " << busy << endl;
+								omp_unset_lock(&iolock);
+							}
 						}
 						continue;
 					}  // case UNSAT for this thread
@@ -358,9 +365,11 @@ int main(int argc, char* argv[])
 			}
 		} while(0);
 
-		omp_set_lock(&iolock);
-		cout << "thread " << tid << " finished" << endl;
-		omp_unset_lock(&iolock);
+		if (VFLAG) {
+			omp_set_lock(&iolock);
+			cout << "thread " << tid << " finished" << endl;
+			omp_unset_lock(&iolock);
+		}
 
 #pragma omp barrier
 #pragma omp for

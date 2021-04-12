@@ -9,11 +9,19 @@ PATH=/home/edison/bin:/home/edison/.local/bin:/usr/local/sbin:/usr/local/bin:/us
 export PATH
 
 POW=3
-while getopts "p:" opt; do
-	POW=$OPTARG
+V=0
+while getopts "vp:" opt; do
+	case $opt in
+		v)
+			V=1
+			;;
+		p)
+			POW=$OPTARG
+			;;
+	esac
 done
 make clean
-make FPOW=$POW
+make FPOW=$POW FV=$V
 echo "start running"
 
 for file in ./input/*
