@@ -6,6 +6,7 @@
  ************************************************************************/
 
 #include<iostream>
+#include<iomanip>
 #include<stdlib.h>
 #include<stdio.h>
 #include<map>
@@ -18,6 +19,7 @@
 #include<fstream>
 #include<cmath>
 #include<unistd.h>
+#include<sys/time.h>
 #include<omp.h>
 
 #include"../utils/dpll.h"
@@ -38,6 +40,7 @@ list<State*> local_stack[NTHREADS];
 vector<State> sat;
 int global_flag = 0;
 omp_lock_t iolock;
+struct timeval timeS, timeE;
 
 #define set(x) omp_set_lock(&lock[x])
 #define unset(x) omp_unset_lock(&lock[x])
@@ -49,7 +52,7 @@ string toString(BIND b, vector<string> a) {
 		string atom = a[j];
 		if (b.find(atom) != b.end()) {
 			if (b[atom] == false) bmap[stoi(atom)] = "-" + atom;
-			else bmap[stoi(atom)] = atom;
+			else bmap[stoi(atom)] = " " + atom;
 		} else {
 			bmap[stoi(atom)] = "/" + atom;
 		}
@@ -109,14 +112,25 @@ inline void clearStack(int ctid) {
 
 int main(int argc, char* argv[])
 {
+	gettimeofday(&timeS, NULL);
 	omp_init_lock(&iolock);
 	CNF originalClauses;
 	string line;
 	string problem_type;
 	int num_variables;
 	int num_clauses;
+	if (argc < 2) {
+		cout << "no input" << endl;
+		exit(1);
+	}
 	ifstream inputFile(argv[1]);
+	ofstream benchmarkFile;
 	string filename(argv[1]);
+	if (!inputFile.is_open()) {
+		cout << "cannot open input file" << endl;
+		exit(1);
+	}
+	filename.erase(0, filename.find_last_of("/") + 1);
 	filename.erase(filename.find_last_of("."), string::npos);
 
 	while (getline(inputFile, line)) {
@@ -386,5 +400,22 @@ int main(int argc, char* argv[])
 		cout << outstr;
 	}
 	if (sat.empty()) cout << "No solution\n";
+
+	gettimeofday(&timeE, NULL);
+	long int interval = (timeE.tv_sec - timeS.tv_sec) * 1000000 + (timeE.tv_usec - timeS.tv_usec);
+	double exec_time_sec = interval * 1e-6;
+	double exec_time_ms = interval * 0.001;
+	if (argc >= 3) {
+		benchmarkFile.open(argv[2], ios::app | ios::out);
+	}
+	if (benchmarkFile.is_open()) {
+		benchmarkFile.setf(std::ios::left);
+		benchmarkFile << setw(25) << filename << " ";
+		benchmarkFile << std::fixed;
+		benchmarkFile << setprecision(6) << setw(10) << exec_time_sec << " ";
+		benchmarkFile << setprecision(3) << setw(10) << exec_time_ms << endl;
+	} else {
+		printf("# execution-time(ms): %.6f %.3f\n", exec_time_sec, exec_time_ms);
+	}
 	return(0);
 }

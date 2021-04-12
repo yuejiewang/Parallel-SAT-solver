@@ -47,12 +47,20 @@ do
 	filename=${file%.*}
 	filename=${filename##*/}
 	if [ ${B} -eq 0 ]; then
+<<<<<<< HEAD
 		./dpll-parallel-p${POW} $file > ./output/$filename.txt
+=======
+		./dpll-parallel $file > ./output/$filename.txt
+>>>>>>> add benchmarks
 	else
 		i=1
 		while [ ${i} -le ${B} ]
 		do
+<<<<<<< HEAD
 			./dpll-parallel-p${POW} $file $benchmark_file > ./output/$filename.txt 
+=======
+			./dpll-parallel $file $benchmark_file > ./output/$filename.txt 
+>>>>>>> add benchmarks
 			i=`expr ${i} + 1`
 		done
 	fi
