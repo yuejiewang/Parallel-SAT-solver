@@ -66,15 +66,16 @@ string toString(BIND b, vector<string> a) {
 inline int getBusyThread() {
 //	usleep(1);
 	int randi = rand() % NTHREADS;
-	if (!local_stack[randi].empty()) return randi;
-	randi = rand() % NTHREADS;
-	if (!local_stack[randi].empty()) return randi;
-	randi = rand() % NTHREADS;
-	if (!local_stack[randi].empty()) return randi;
+//	if (!local_stack[randi].empty()) return randi;
+//	randi = rand() % NTHREADS;
+//	if (!local_stack[randi].empty()) return randi;
+//	randi = rand() % NTHREADS;
+//	if (!local_stack[randi].empty()) return randi;
 	// after generating three random numbers, just pick the first busy thread...
-	for (int t = 0; t < NTHREADS; t++) {
-		if (!local_stack[t].empty()) {
-			return t;
+	for (int t = randi; t < NTHREADS + randi; t++) {
+		int tmpi = t % NTHREADS;
+		if (!local_stack[tmpi].empty()) {
+			return tmpi;
 		}
 	}
 	
@@ -147,11 +148,7 @@ int main(int argc, char* argv[])
 #pragma omp parallel num_threads(NTHREADS)
 	{
 		int tid = omp_get_thread_num();
-#pragma omp for
-		for (int pid = 0; pid <	NTHREADS; pid++)
-		{
-			omp_init_lock(&lock[pid]);
-		}
+		omp_init_lock(&lock[tid]);
 
 #pragma omp barrier
 		do {
@@ -372,12 +369,7 @@ int main(int argc, char* argv[])
 		}
 
 #pragma omp barrier
-#pragma omp for
-		for (int pid = 0; pid <	NTHREADS; pid++)
-		{
-			int tid = omp_get_thread_num();
-			omp_destroy_lock(&lock[tid]);
-		}
+		omp_destroy_lock(&lock[tid]);
 	}
 
 	omp_destroy_lock(&iolock);
