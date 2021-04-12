@@ -9,7 +9,11 @@ Program exits when all threads are finished. No load-balancing is implemented, s
 Pseudo code for the algorithm design is in pseudocode.txt (need update).
 
 Compilation:
-make dpll-parallel
+$\color{#0000FF}{
+make dpll-parallel [FPOW=pow]
+where pow is a non-negative int and thread number will be set to 2^pow
+default: pow=3 and thread_number=8
+}$
 
 Clean up:
 make clean
@@ -18,8 +22,11 @@ Run parallel DPLL with inputfile named TEST.cnf:
 ./dpll-parallel TEST.cnf
 
 OR store TEST.cnf in input/ or large_input/ directory and run the shell scripts:
-Run small tests: ./run.sh
-Run large tests: ./run_large.sh
+$\color{#0000FF}{
+Run small tests: ./run.sh [-p pow]
+Run large tests: ./run_large.sh [-p pow]
+pow is defined the same as in makefile, default pow = 3
+}$
 
 The DPLL output is in the form of:
 if a variable x is true, "${x}" is printed
@@ -35,9 +42,17 @@ Current test cases and performance:
 input: test case that terminate within a few seconds
 large_input: could run for several minutes
 
+$\color{#0000FF}{
+Improvements on this branch:
+work sharing (load balancing) among threads
+correctness check when unsatisfiable (adding known unsatisfiable tests with prefix unsat-)
+
+modify makefile to allow compile time definition of thread number, POW being any non-negative int and NTHREADS = 2^POW (so don't need to change the source code)
+}$
+
+$\color{#00FF00}{
 TODO:
-work sharing (stealing) among threads
 force killing all other threads when one finds a solution
 benchmarks
-correctness check when unsatisfiable (maybe just look for existing unsatisfiable test cases)
+}$
 

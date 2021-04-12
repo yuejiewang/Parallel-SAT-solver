@@ -15,21 +15,27 @@
 #include<cstring>
 #include<string>
 #include<sstream>
-#include<omp.h>
 #include<fstream>
+#include<cmath>
+#include<unistd.h>
+#include<omp.h>
+
 #include"../utils/dpll.h"
 #include"../utils/inputReader.h"
+
 using namespace std;
-static const int NTHREADS = 16;
-static const int POW = 4;
+
+//static const int NTHREADS = 16;
+//static const int POW = 4;
 typedef vector<string> CLAUSE;
 typedef vector<CLAUSE> CNF;
 typedef map<string, bool> BIND;
 
+static const int NTHREADS = pow(2, POW);
 static omp_lock_t lock[NTHREADS];
 list<State*> local_stack[NTHREADS];
 vector<State> sat;
-int global_flag = 0;
+// int global_flag = 0;
 omp_lock_t iolock;
 
 #define set(x) omp_set_lock(&lock[x])
@@ -57,6 +63,7 @@ string toString(BIND b, vector<string> a) {
 
 // get tid for a busy thread using random strategy
 inline int getBusyThread() {
+//	usleep(1);
 	int randi = rand() % NTHREADS;
 	if (!local_stack[randi].empty()) return randi;
 	randi = rand() % NTHREADS;
@@ -64,7 +71,6 @@ inline int getBusyThread() {
 	randi = rand() % NTHREADS;
 	if (!local_stack[randi].empty()) return randi;
 	// after generating three random numbers, just pick the first busy thread...
-	
 	for (int t = 0; t < NTHREADS; t++) {
 		if (!local_stack[t].empty()) {
 			return t;
@@ -139,6 +145,7 @@ int main(int argc, char* argv[])
 
 #pragma omp parallel num_threads(NTHREADS)
 	{
+		int tid = omp_get_thread_num();
 #pragma omp for
 		for (int pid = 0; pid <	NTHREADS; pid++)
 		{
@@ -148,23 +155,26 @@ int main(int argc, char* argv[])
 #pragma omp barrier
 		do {
 			int end_flag = 0;
-			int tid = omp_get_thread_num();
 			stringstream ss_tid;
 			ss_tid << tid;
 			string tid_str;
 			ss_tid >> tid_str;  // for debug
-			if (local_stack[tid].empty() || global_flag) break;
+			State* root = NULL;
 // ---------------------------- critical section ----------------------------------------
-//			set(tid);
-			State* root = local_stack[tid].back();
-			local_stack[tid].pop_back();
-//			unset(tid);
+			set(tid);
+			if (local_stack[tid].empty()) {
+				end_flag = 2;
+			} else {
+				root = local_stack[tid].back();
+				local_stack[tid].pop_back();
+			}
+			unset(tid);
 // ---------------------------- end critical section ------------------------------------
 			if (root == NULL) break;
 			if (root->clauses.empty()) {
 				end_flag = 1;
 				clearStack(tid);
-				global_flag = 1;
+//				global_flag = 1;
 				omp_set_lock(&iolock);
 				sat.push_back(*root);
 				omp_unset_lock(&iolock);
@@ -180,7 +190,7 @@ int main(int argc, char* argv[])
 			if (root->clauses.empty()) {
 				end_flag = 1;
 				clearStack(tid);
-				global_flag = 1;
+//				global_flag = 1;
 				omp_set_lock(&iolock);
 				sat.push_back(*root);
 				omp_unset_lock(&iolock);
@@ -207,7 +217,7 @@ int main(int argc, char* argv[])
 				if (root->clauses.empty()) {
 					end_flag = 1;
 					clearStack(tid);
-					global_flag = 1;
+//					global_flag = 1;
 					omp_set_lock(&iolock);
 					sat.push_back(*root);
 					omp_unset_lock(&iolock);
@@ -222,7 +232,7 @@ int main(int argc, char* argv[])
 				if (root->clauses.empty()) {
 					end_flag = 1;
 					clearStack(tid);
-					global_flag = 1;
+//					global_flag = 1;
 					omp_set_lock(&iolock);
 					sat.push_back(*root);
 					omp_unset_lock(&iolock);
@@ -235,26 +245,36 @@ int main(int argc, char* argv[])
 			if (end_flag == 2) {
 				root = NULL;
 				int busy = getBusyThread();
-				if (busy != -1) root = loadShare(busy);
+				if (busy != -1) {
+					root = loadShare(busy);
+					omp_set_lock(&iolock);
+					cout << "# thread " << tid << " takes from thread " << busy << endl;
+					omp_unset_lock(&iolock);
+				}
 			}
 
 			State* current_state = root;  // subtree traversal for this thread
 			while (current_state != NULL) {
-				if (global_flag) break;
+//				if (global_flag) break;
 				if (current_state->conflict) {
 					if (local_stack[tid].empty()) {
 						delete current_state;
 						current_state = NULL;
 						end_flag = 2;
-						if (global_flag) break;
+//						if (global_flag) break;
 						int busy = getBusyThread();
-						if (busy != -1) current_state = loadShare(busy);
+						if (busy != -1) {
+							current_state = loadShare(busy);
+							omp_set_lock(&iolock);
+							cout << "# thread " << tid << " takes from thread " << busy << endl;
+							omp_unset_lock(&iolock);
+						}
 						continue;
 					}  // case UNSAT for this thread
 					else {
 						delete current_state;
 						current_state = NULL;
-						if (global_flag) break;
+//						if (global_flag) break;
 // ---------------------------- critical section ----------------------------------------
 						set(tid);
 						if (local_stack[tid].empty()) current_state = NULL;
@@ -270,7 +290,7 @@ int main(int argc, char* argv[])
 				if (current_state->clauses.empty()) {
 					end_flag = 1;
 					clearStack(tid);
-					global_flag = 1;
+//					global_flag = 1;
 					omp_set_lock(&iolock);
 					sat.push_back(*current_state);
 					omp_unset_lock(&iolock);
@@ -283,15 +303,20 @@ int main(int argc, char* argv[])
 						delete current_state;
 						current_state = NULL;
 						end_flag = 2;
-						if (global_flag) break;
+//						if (global_flag) break;
 						int busy = getBusyThread();
-						if (busy != -1) current_state = loadShare(busy);
+						if (busy != -1) {
+							current_state = loadShare(busy);
+							omp_set_lock(&iolock);
+							cout << "# thread " << tid << " takes from thread " << busy << endl;
+							omp_unset_lock(&iolock);
+						}
 						continue;
 					}  // case UNSAT for this thread
 					else {
 						delete current_state;
 						current_state = NULL;
-						if (global_flag) break;
+//						if (global_flag) break;
 // ---------------------------- critical section ----------------------------------------
 
 						set(tid);
@@ -308,7 +333,7 @@ int main(int argc, char* argv[])
 				if (current_state->clauses.empty()) {
 					end_flag = 1;
 					clearStack(tid);
-					global_flag = 1;
+//					global_flag = 1;
 					omp_set_lock(&iolock);
 					sat.push_back(*current_state);
 					omp_unset_lock(&iolock);
@@ -324,7 +349,7 @@ int main(int argc, char* argv[])
 				*rstate = propagate(copy, split, true);
 				delete current_state;
 				current_state = lstate;
-				if (global_flag) break;
+//				if (global_flag) break;
 // ---------------------------- critical section ----------------------------------------
 				set(tid);
 				local_stack[tid].push_back(rstate);
@@ -332,6 +357,10 @@ int main(int argc, char* argv[])
 // ---------------------------- end critical section ------------------------------------
 			}
 		} while(0);
+
+		omp_set_lock(&iolock);
+		cout << "thread " << tid << " finished" << endl;
+		omp_unset_lock(&iolock);
 
 #pragma omp barrier
 #pragma omp for
@@ -342,12 +371,12 @@ int main(int argc, char* argv[])
 		}
 	}
 
+	omp_destroy_lock(&iolock);
+
 	if (!sat.empty()) {
 		string outstr = toString(sat[0].bindings, atoms);
 		cout << outstr;
 	}
-	
-	omp_destroy_lock(&iolock);
-	if (!global_flag) cout << "No solution\n";
+	if (sat.empty()) cout << "No solution\n";
 	return(0);
 }
