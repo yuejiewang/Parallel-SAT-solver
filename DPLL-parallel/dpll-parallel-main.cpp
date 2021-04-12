@@ -36,7 +36,7 @@ static const int NTHREADS = pow(2, POW);
 static omp_lock_t lock[NTHREADS];
 list<State*> local_stack[NTHREADS];
 vector<State> sat;
-// int global_flag = 0;
+int global_flag = 0;
 omp_lock_t iolock;
 
 #define set(x) omp_set_lock(&lock[x])
@@ -89,7 +89,7 @@ inline State* loadShare(int btid) {
 	// sequentially set lock to avoid deadlock
 	set(btid);
 	State* t = NULL;
-	if (!local_stack[btid].empty()) {
+	if (!local_stack[btid].empty() && !global_flag) {
 		t = local_stack[btid].front();
 		local_stack[btid].pop_front();
 	}
@@ -163,8 +163,10 @@ int main(int argc, char* argv[])
 			if (local_stack[tid].empty()) {
 				end_flag = 2;
 			} else {
-				root = local_stack[tid].back();
-				local_stack[tid].pop_back();
+				if (!global_flag) {
+					root = local_stack[tid].back();
+					local_stack[tid].pop_back();
+				}
 			}
 			unset(tid);
 // ---------------------------- end critical section ------------------------------------
@@ -172,7 +174,7 @@ int main(int argc, char* argv[])
 			if (root->clauses.empty()) {
 				end_flag = 1;
 				clearStack(tid);
-//				global_flag = 1;
+				global_flag = 1;
 				omp_set_lock(&iolock);
 				sat.push_back(*root);
 				omp_unset_lock(&iolock);
@@ -188,7 +190,7 @@ int main(int argc, char* argv[])
 			if (root->clauses.empty()) {
 				end_flag = 1;
 				clearStack(tid);
-//				global_flag = 1;
+				global_flag = 1;
 				omp_set_lock(&iolock);
 				sat.push_back(*root);
 				omp_unset_lock(&iolock);
@@ -200,6 +202,7 @@ int main(int argc, char* argv[])
 				clearStack(tid);
 				break;
 			}
+			
 			// compute the root node for each thread if nthreads > 1
 			// NTHREADS = 2^POW
 			for (int p = 0; p < POW; p++) {
@@ -215,7 +218,7 @@ int main(int argc, char* argv[])
 				if (root->clauses.empty()) {
 					end_flag = 1;
 					clearStack(tid);
-//					global_flag = 1;
+					global_flag = 1;
 					omp_set_lock(&iolock);
 					sat.push_back(*root);
 					omp_unset_lock(&iolock);
@@ -230,7 +233,7 @@ int main(int argc, char* argv[])
 				if (root->clauses.empty()) {
 					end_flag = 1;
 					clearStack(tid);
-//					global_flag = 1;
+					global_flag = 1;
 					omp_set_lock(&iolock);
 					sat.push_back(*root);
 					omp_unset_lock(&iolock);
@@ -281,8 +284,10 @@ int main(int argc, char* argv[])
 						set(tid);
 						if (local_stack[tid].empty()) current_state = NULL;
 						else {
-							current_state = local_stack[tid].back();
-							local_stack[tid].pop_back();
+							if (!global_flag) {
+								current_state = local_stack[tid].back();
+								local_stack[tid].pop_back();
+							}
 						}
 						unset(tid);
 // ---------------------------- end critical section ------------------------------------
@@ -292,7 +297,7 @@ int main(int argc, char* argv[])
 				if (current_state->clauses.empty()) {
 					end_flag = 1;
 					clearStack(tid);
-//					global_flag = 1;
+					global_flag = 1;
 					omp_set_lock(&iolock);
 					sat.push_back(*current_state);
 					omp_unset_lock(&iolock);
@@ -326,8 +331,10 @@ int main(int argc, char* argv[])
 						set(tid);
 						if (local_stack[tid].empty()) current_state = NULL;
 						else {
-							current_state = local_stack[tid].back();
-							local_stack[tid].pop_back();
+							if (!global_flag) {
+								current_state = local_stack[tid].back();
+								local_stack[tid].pop_back();
+							}
 						}
 						unset(tid);
 // ---------------------------- end critical section ------------------------------------
@@ -337,7 +344,7 @@ int main(int argc, char* argv[])
 				if (current_state->clauses.empty()) {
 					end_flag = 1;
 					clearStack(tid);
-//					global_flag = 1;
+					global_flag = 1;
 					omp_set_lock(&iolock);
 					sat.push_back(*current_state);
 					omp_unset_lock(&iolock);
