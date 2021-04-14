@@ -111,32 +111,24 @@ string nextUnboundAtom(State s) {
     return unbound[0];
 }
 
-string stringifyBindings(map<string, bool> bindings, vector<string> atoms) {
-    map<int, bool> intBindings;
-    vector<string> either;
-    for (int i = 0; i < atoms.size(); i++) {
-        string atom = atoms[i];
-        if (bindings.find(atom) == bindings.end()) { // atom not in bindings
-            // add to list "either"
-            either.push_back(atom);
-            // add to bindings with value true
-            bindings.insert(pair<string, bool>(atom, true));
+string stringifyBindings(map<string, bool> b, vector<string> a) {
+    map<int, string> bmap;
+    string str = "";
+    for (size_t j = 0; j < a.size(); j++) {
+        string atom = a[j];
+        if (b.find(atom) != b.end()) {
+            if (b[atom] == false) bmap[stoi(atom)] = "-" + atom;
+            else bmap[stoi(atom)] = atom;
+        } else {
+            bmap[stoi(atom)] = "/" + atom;
         }
     }
-    for (auto const&[key, val] : bindings) {
-        intBindings.insert(pair<int, bool>(stoi(key), val));
+    for (auto const&[key, val] : bmap) {
+        str += val;
+        str += "\n";
     }
-    string result = "";
-    for (auto const&[key, val] : intBindings) {
-        result += to_string(key) + " ";
-        if (find(either.begin(), either.end(), to_string(key)) != either.end()) {
-            result += "true or false";
-        } else {
-            result += val ? "true" : "false";
-        };
-        result += "\n";
-    }
-    return result;
+    str += "\n";
+    return str;
 }
 
 string DPLL(State s, vector<string> atoms) {

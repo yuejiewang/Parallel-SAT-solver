@@ -62,8 +62,8 @@ void runWithInputFile(string inputFileName) {
     }
 
     // Create and open output file
-    ofstream outputFile("../output/sequential_"+filename+"_output.txt");
-    cout << "writing to ../output/sequential_"+filename+"_output.txt" << endl;
+    ofstream outputFile("../sequential_output/"+filename+".txt");
+    cout << "writing to ../sequential_output/"+filename+".txt" << endl;
 
     // Write to the file
     outputFile << output + "\n";
