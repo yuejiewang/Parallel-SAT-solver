@@ -112,6 +112,7 @@ inline void clearStack(int ctid) {
 
 int main(int argc, char* argv[])
 {
+	cout << "# NTHREADS=" << NTHREADS << endl;
 	gettimeofday(&timeS, NULL);
 	omp_init_lock(&iolock);
 	CNF originalClauses;
