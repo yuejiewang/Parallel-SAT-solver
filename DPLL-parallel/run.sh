@@ -36,26 +36,26 @@ echo "p${POW} start"
 if [ ${B} -ne 0 ]; then
 	if [ -z ${benchmark_file} ]
 	then
-		benchmark_file="benchmark_small_p${POW}_b${B}.txt"
+		benchmark_file="../benchmarks/benchmark_small_p${POW}_b${B}.txt"
 		rm -f $benchmark_file
 	else
 		rm -f $benchmark_file
 	fi
 fi
-for file in ./input/*
+for file in ../input/*
 do
 	filename=${file%.*}
 	filename=${filename##*/}
 	if [ ${B} -eq 0 ]; then
-		./dpll-parallel-p${POW} $file > ./output/$filename.txt
+		./dpll-parallel-p${POW} $file > ../output_parallel_p${POW}/$filename.txt
 	else
 		i=1
 		while [ ${i} -le ${B} ]
 		do
-			./dpll-parallel-p${POW} $file $benchmark_file > ./output/$filename.txt 
+			./dpll-parallel-p${POW} $file $benchmark_file > ../output_parallel_p${POW}/$filename.txt 
 			i=`expr ${i} + 1`
 		done
 	fi
 	echo "------------ ${filename}"
-	# python3 check_sat.py -c input/$filename.cnf -o $filename.txt
+	# python3 check_sat.py -c ../input/$filename.cnf -o ../output_parallel_p${POW}/$filename.txt
 done

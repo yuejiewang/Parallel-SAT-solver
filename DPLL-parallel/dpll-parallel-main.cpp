@@ -405,16 +405,16 @@ int main(int argc, char* argv[])
 	gettimeofday(&timeE, NULL);
 	long int interval = (timeE.tv_sec - timeS.tv_sec) * 1000000 + (timeE.tv_usec - timeS.tv_usec);
 	double exec_time_sec = interval * 1e-6;
-	double exec_time_ms = interval * 0.001;
+	double exec_time_ms = interval * 1e-3;
 	if (argc >= 3) {
 		benchmarkFile.open(argv[2], ios::app | ios::out);
 	}
 	if (benchmarkFile.is_open()) {
 		benchmarkFile.setf(std::ios::left);
-		benchmarkFile << setw(25) << filename << " ";
+		benchmarkFile << setw(50) << filename << " ";
 		benchmarkFile << std::fixed;
-		benchmarkFile << setprecision(6) << setw(10) << exec_time_sec << " ";
-		benchmarkFile << setprecision(3) << setw(10) << exec_time_ms << endl;
+		benchmarkFile << setprecision(6) << setw(10) << exec_time_sec << endl;
+//		benchmarkFile << setprecision(3) << setw(10) << exec_time_ms << endl;
 	} else {
 		printf("# execution-time(ms): %.6f %.3f\n", exec_time_sec, exec_time_ms);
 	}

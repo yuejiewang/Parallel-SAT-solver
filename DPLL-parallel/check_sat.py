@@ -11,7 +11,7 @@ def main(argv):
 
     for option, value in options:
         if option in ("-o", "--output"):
-            result_file_name = "output/" + value
+            result_file_name = value
         if option in ("-c", "-i", "--cnf", "--input"):
             cnf_file_name = value
 
