@@ -8,8 +8,10 @@
 #include <algorithm>
 #include <iterator>
 #include <filesystem>
-#include "inputReader.h"
-#include "dpll.h"
+
+#include"../utils/dpll.h"
+#include"../utils/inputReader.h"
+
 namespace fs = std::filesystem;
 
 using namespace std;
