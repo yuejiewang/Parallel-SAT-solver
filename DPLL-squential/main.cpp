@@ -8,14 +8,33 @@
 #include <algorithm>
 #include <iterator>
 #include <filesystem>
-#include "inputReader.h"
-#include "dpll.h"
+
+#include"dpll.h"
+#include"inputReader.h"
+
 namespace fs = std::filesystem;
 
 using namespace std;
 
+string getFileName(const string &s) {
+
+    char sep = '/';
+
+#ifdef _WIN32
+    sep = '\\';
+#endif
+
+    size_t i = s.rfind(sep, s.length());
+    if (i != string::npos) {
+        return (s.substr(i + 1, s.length() - i));
+    }
+
+    return ("");
+}
+
+
 void runWithInputFile(string inputFileName) {
-    vector<vector<string>> originalClauses;
+    vector <vector<string>> originalClauses;
     // Create a text string, which is used to output the text file
     string line;
     string problem_type;
@@ -23,20 +42,25 @@ void runWithInputFile(string inputFileName) {
     int num_clauses;
     // Read from the text file
     ifstream inputFile(inputFileName);
-    string filename = inputFileName.substr(9);
-    filename.erase(filename.find_last_of("."), string::npos);
+    cout << inputFileName << endl;
+    string filename =  fs::path( inputFileName ).stem();
+//    filename.erase(inputFileName.find_last_of("."), string::npos);
 
 
     // Use a while loop together with the getline() function to read the file line by line
     cout << "reading: " << inputFileName << endl;
     while (getline(inputFile, line)) {
+        line.erase(0, line.find_first_not_of(" \n\t"));
+
+        cout << "split into clauses: " + line << endl;
+
         // Output the text from the file
         if (line[0] == 'p') {
             problem_type = line[2];
             num_variables = (int) line[4];
             num_clauses = (int) line[6];
         } else if (line[0] != 'c' && (isdigit(line[0]) || line[0] == '-')) {
-            vector<string> clauseStrings = splitIntoClauses(line);
+            vector <string> clauseStrings = splitIntoClauses(line);
             for (int i = 0; i < clauseStrings.size(); i++)
                 originalClauses.push_back(splitClause(clauseStrings[i]));
         }
@@ -48,7 +72,7 @@ void runWithInputFile(string inputFileName) {
     inputFile.close();
 
     // Run the actual DPLL algorithm
-    vector<string> atoms = makeAtomList(originalClauses);
+    vector <string> atoms = makeAtomList(originalClauses);
     map<string, bool> b;
     State original = State{originalClauses, b};
     string answer = DPLL(original, atoms);
@@ -60,8 +84,8 @@ void runWithInputFile(string inputFileName) {
     }
 
     // Create and open output file
-    ofstream outputFile("../output/sequential_"+filename+"_output.txt");
-    cout << "writing to ../output/sequential_"+filename+"_output.txt" << endl;
+    ofstream outputFile("../sequential_output/" + filename + ".txt");
+    cout << "writing to ../sequential_output/" + filename + ".txt" << endl;
 
     // Write to the file
     outputFile << output + "\n";
@@ -70,9 +94,9 @@ void runWithInputFile(string inputFileName) {
     outputFile.close();
 }
 
-void runWithAllInputFiles(){
+void runWithAllInputFiles() {
     string path = "../input";
-    for (const auto & entry : fs::directory_iterator(path)) {
+    for (const auto &entry : fs::directory_iterator(path)) {
         std::cout << "running on input file: " << entry.path() << std::endl;
         runWithInputFile(entry.path());
     }
@@ -80,7 +104,7 @@ void runWithAllInputFiles(){
 
 
 int main(int argc, char *argv[]) {
-    if(argc == 2){
+    if (argc == 2) {
         runWithInputFile(argv[1]);
     } else {
         runWithAllInputFiles();
