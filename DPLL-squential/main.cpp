@@ -9,8 +9,8 @@
 #include <iterator>
 #include <filesystem>
 
-#include"../utils/dpll.h"
-#include"../utils/inputReader.h"
+#include"dpll.h"
+#include"inputReader.h"
 
 namespace fs = std::filesystem;
 
