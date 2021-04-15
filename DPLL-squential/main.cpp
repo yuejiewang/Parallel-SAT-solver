@@ -78,7 +78,7 @@ void runWithInputFile(string inputFileName) {
     // Run the actual DPLL algorithm
     vector <string> atoms = makeAtomList(originalClauses);
     map<string, bool> b;
-    State original = State{originalClauses, b};
+    State original = State{false, originalClauses, b};
     string answer = DPLL(original, atoms);
     string output;
     if (answer.compare("Fail") == 0) {

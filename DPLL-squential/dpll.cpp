@@ -38,6 +38,7 @@ bool containsEmptyClause(vector<vector<string>> clauses) {
 State propagate(State s, string atom, bool value) {
     s.bindings.insert(pair<string, bool>(atom, value));
     string literal, opposite;
+    bool conflict = false;
     if (value) {
         literal = atom;
         opposite = "-" + atom;
@@ -52,12 +53,15 @@ State propagate(State s, string atom, bool value) {
         if (oppIndex != clause.end()) { // if opposite in clause
             clause.erase(oppIndex);
         }
+        if (clause.empty()) {
+            conflict = true;
+        }
         auto litIndex = find(clause.begin(), clause.end(), literal);
         if (litIndex == clause.end()) { // if literal is not in clause
             result_clauses.push_back(clause);
         }
     }
-    return State{result_clauses, s.bindings};
+    return State{conflict, result_clauses, s.bindings};
 }
 
 State handleEasyCases(State s) {
@@ -66,7 +70,7 @@ State handleEasyCases(State s) {
         map<string, bool> oldBindings(s.bindings);
 //        cout << "starting with " << s.clauses.size() << " clauses: " << endl;
 //        print(s.clauses);
-        State resultState = State{s.clauses, s.bindings};
+        State resultState = State{s.conflict, s.clauses, s.bindings};
         for (int i = 0; i < s.clauses.size(); i++) {
             vector<string> clause = s.clauses[i];
             if (clause.size() == 1) { // case 1: singleton clause
@@ -142,26 +146,23 @@ string stringifyBindings(map<string, bool> b, vector<string> a) {
 string DPLL(State s, vector<string> atoms) {
     // replace with a while loop
 //    cout << "starting with " << s.clauses.size() << " clauses: " << endl;
+    bool conflict = s.conflict;
     vector<vector<string>> clauses = s.clauses;
     map<string, bool> bindings = s.bindings;
     if (clauses.size() == 0) { // done! solution found
         return stringifyBindings(bindings, atoms);
     }
-    if (containsEmptyClause(clauses)) {
-        return "Fail";
-    }
     State easyCasesResult = handleEasyCases(s);
+    conflict = easyCasesResult.conflict;
     clauses = easyCasesResult.clauses;
     bindings = easyCasesResult.bindings;
     if (clauses.size() == 0) { // done! solution found
         return stringifyBindings(bindings, atoms);
     }
-    if (containsEmptyClause(clauses)) {
+    if (conflict){ //containsEmptyClause(clauses)) {
         return "Fail";
     }
-//    vector<vector<string>> clausesCopy(clauses);
-//    map<string, bool> bindingsCopy(bindings);
-    State stateCopyTrue = State{clauses, bindings};
+    State stateCopyTrue = State{conflict, clauses, bindings};
     string unboundAtom = nextUnboundAtom(stateCopyTrue);
     // see if we find a solution with the unbound atom bound to true
     stateCopyTrue = propagate(stateCopyTrue, unboundAtom, true);
@@ -170,7 +171,7 @@ string DPLL(State s, vector<string> atoms) {
         return answer;
     }
     // see if we find a solution with the unbound atom bound to false
-    State stateCopyFalse = State{clauses, bindings};
+    State stateCopyFalse = State{conflict, clauses, bindings};
     stateCopyFalse = propagate(stateCopyFalse, unboundAtom, false);
     return DPLL(stateCopyFalse, atoms);
 }

@@ -7,6 +7,7 @@
 using namespace std;
 
 struct State {
+    bool conflict;
     vector<vector<string>> clauses;
     map<string, bool> bindings;
 };
