@@ -53,7 +53,7 @@ void runWithInputFile(string inputFileName) {
 
 
     // Use a while loop together with the getline() function to read the file line by line
-    cout << "reading: " << inputFileName << endl;
+    cout << "reading : " << inputFileName << endl;
     while (getline(inputFile, line)) {
         line.erase(0, line.find_first_not_of(" \n\t"));
         // Output the text from the file
