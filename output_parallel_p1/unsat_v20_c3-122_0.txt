@@ -1,0 +1,2 @@
+# NTHREADS=2
+No solution

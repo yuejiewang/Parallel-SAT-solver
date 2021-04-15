@@ -6,6 +6,7 @@
  ************************************************************************/
 
 #include<iostream>
+#include<iomanip>
 #include<stdlib.h>
 #include<stdio.h>
 #include<map>
@@ -18,6 +19,7 @@
 #include<fstream>
 #include<cmath>
 #include<unistd.h>
+#include<sys/time.h>
 #include<omp.h>
 
 #include"../utils/dpll.h"
@@ -36,8 +38,9 @@ static const int NTHREADS = pow(2, POW);
 static omp_lock_t lock[NTHREADS];
 list<State*> local_stack[NTHREADS];
 vector<State> sat;
-// int global_flag = 0;
+int global_flag = 0;
 omp_lock_t iolock;
+struct timeval timeS, timeE;
 
 #define set(x) omp_set_lock(&lock[x])
 #define unset(x) omp_unset_lock(&lock[x])
@@ -49,7 +52,7 @@ string toString(BIND b, vector<string> a) {
 		string atom = a[j];
 		if (b.find(atom) != b.end()) {
 			if (b[atom] == false) bmap[stoi(atom)] = "-" + atom;
-			else bmap[stoi(atom)] = atom;
+			else bmap[stoi(atom)] = " " + atom;
 		} else {
 			bmap[stoi(atom)] = "/" + atom;
 		}
@@ -89,7 +92,7 @@ inline State* loadShare(int btid) {
 	// sequentially set lock to avoid deadlock
 	set(btid);
 	State* t = NULL;
-	if (!local_stack[btid].empty()) {
+	if (!local_stack[btid].empty() && !global_flag) {
 		t = local_stack[btid].front();
 		local_stack[btid].pop_front();
 	}
@@ -109,14 +112,26 @@ inline void clearStack(int ctid) {
 
 int main(int argc, char* argv[])
 {
+	cout << "# NTHREADS=" << NTHREADS << endl;
+	gettimeofday(&timeS, NULL);
 	omp_init_lock(&iolock);
 	CNF originalClauses;
 	string line;
 	string problem_type;
 	int num_variables;
 	int num_clauses;
+	if (argc < 2) {
+		cout << "no input" << endl;
+		exit(1);
+	}
 	ifstream inputFile(argv[1]);
+	ofstream benchmarkFile;
 	string filename(argv[1]);
+	if (!inputFile.is_open()) {
+		cout << "cannot open input file" << endl;
+		exit(1);
+	}
+	filename.erase(0, filename.find_last_of("/") + 1);
 	filename.erase(filename.find_last_of("."), string::npos);
 
 	while (getline(inputFile, line)) {
@@ -163,8 +178,10 @@ int main(int argc, char* argv[])
 			if (local_stack[tid].empty()) {
 				end_flag = 2;
 			} else {
-				root = local_stack[tid].back();
-				local_stack[tid].pop_back();
+				if (!global_flag) {
+					root = local_stack[tid].back();
+					local_stack[tid].pop_back();
+				}
 			}
 			unset(tid);
 // ---------------------------- end critical section ------------------------------------
@@ -172,7 +189,7 @@ int main(int argc, char* argv[])
 			if (root->clauses.empty()) {
 				end_flag = 1;
 				clearStack(tid);
-//				global_flag = 1;
+				global_flag = 1;
 				omp_set_lock(&iolock);
 				sat.push_back(*root);
 				omp_unset_lock(&iolock);
@@ -188,7 +205,7 @@ int main(int argc, char* argv[])
 			if (root->clauses.empty()) {
 				end_flag = 1;
 				clearStack(tid);
-//				global_flag = 1;
+				global_flag = 1;
 				omp_set_lock(&iolock);
 				sat.push_back(*root);
 				omp_unset_lock(&iolock);
@@ -200,6 +217,7 @@ int main(int argc, char* argv[])
 				clearStack(tid);
 				break;
 			}
+			
 			// compute the root node for each thread if nthreads > 1
 			// NTHREADS = 2^POW
 			for (int p = 0; p < POW; p++) {
@@ -215,7 +233,7 @@ int main(int argc, char* argv[])
 				if (root->clauses.empty()) {
 					end_flag = 1;
 					clearStack(tid);
-//					global_flag = 1;
+					global_flag = 1;
 					omp_set_lock(&iolock);
 					sat.push_back(*root);
 					omp_unset_lock(&iolock);
@@ -230,7 +248,7 @@ int main(int argc, char* argv[])
 				if (root->clauses.empty()) {
 					end_flag = 1;
 					clearStack(tid);
-//					global_flag = 1;
+					global_flag = 1;
 					omp_set_lock(&iolock);
 					sat.push_back(*root);
 					omp_unset_lock(&iolock);
@@ -281,8 +299,10 @@ int main(int argc, char* argv[])
 						set(tid);
 						if (local_stack[tid].empty()) current_state = NULL;
 						else {
-							current_state = local_stack[tid].back();
-							local_stack[tid].pop_back();
+							if (!global_flag) {
+								current_state = local_stack[tid].back();
+								local_stack[tid].pop_back();
+							}
 						}
 						unset(tid);
 // ---------------------------- end critical section ------------------------------------
@@ -292,7 +312,7 @@ int main(int argc, char* argv[])
 				if (current_state->clauses.empty()) {
 					end_flag = 1;
 					clearStack(tid);
-//					global_flag = 1;
+					global_flag = 1;
 					omp_set_lock(&iolock);
 					sat.push_back(*current_state);
 					omp_unset_lock(&iolock);
@@ -326,8 +346,10 @@ int main(int argc, char* argv[])
 						set(tid);
 						if (local_stack[tid].empty()) current_state = NULL;
 						else {
-							current_state = local_stack[tid].back();
-							local_stack[tid].pop_back();
+							if (!global_flag) {
+								current_state = local_stack[tid].back();
+								local_stack[tid].pop_back();
+							}
 						}
 						unset(tid);
 // ---------------------------- end critical section ------------------------------------
@@ -337,7 +359,7 @@ int main(int argc, char* argv[])
 				if (current_state->clauses.empty()) {
 					end_flag = 1;
 					clearStack(tid);
-//					global_flag = 1;
+					global_flag = 1;
 					omp_set_lock(&iolock);
 					sat.push_back(*current_state);
 					omp_unset_lock(&iolock);
@@ -379,5 +401,22 @@ int main(int argc, char* argv[])
 		cout << outstr;
 	}
 	if (sat.empty()) cout << "No solution\n";
+
+	gettimeofday(&timeE, NULL);
+	long int interval = (timeE.tv_sec - timeS.tv_sec) * 1000000 + (timeE.tv_usec - timeS.tv_usec);
+	double exec_time_sec = interval * 1e-6;
+	double exec_time_ms = interval * 1e-3;
+	if (argc >= 3) {
+		benchmarkFile.open(argv[2], ios::app | ios::out);
+	}
+	if (benchmarkFile.is_open()) {
+		benchmarkFile.setf(std::ios::left);
+		benchmarkFile << setw(50) << filename << " ";
+		benchmarkFile << std::fixed;
+		benchmarkFile << setprecision(6) << setw(10) << exec_time_sec << endl;
+//		benchmarkFile << setprecision(3) << setw(10) << exec_time_ms << endl;
+	} else {
+		printf("# execution-time(ms): %.6f %.3f\n", exec_time_sec, exec_time_ms);
+	}
 	return(0);
 }
