@@ -3,12 +3,10 @@ import os
 from check_sat import *
 
 input_dir = "../input/"
-large_input_dir = "../DPLL-parallel/large_input/"
-par_output_dir = "../DPLL-parallel/output/"
+par_output_dir = "../output_parallel_p0/"
 seq_output_dir = "../sequential_output/"
 
 input_files = os.listdir(input_dir)
-large_input_files = os.listdir(large_input_dir)
 sat_input_files = [file for file in input_files if file[0] == "s"]
 unsat_input_files = [file for file in input_files if file[0] == "u"]
 

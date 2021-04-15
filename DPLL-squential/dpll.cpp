@@ -64,8 +64,8 @@ State handleEasyCases(State s) {
     bool stillChanging = true;
     while (stillChanging) {
         map<string, bool> oldBindings(s.bindings);
-        cout << "starting with " << s.clauses.size() << " clauses: " << endl;
-        print(s.clauses);
+//        cout << "starting with " << s.clauses.size() << " clauses: " << endl;
+//        print(s.clauses);
         State resultState = State{s.clauses, s.bindings};
         for (int i = 0; i < s.clauses.size(); i++) {
             vector<string> clause = s.clauses[i];
@@ -141,7 +141,7 @@ string stringifyBindings(map<string, bool> b, vector<string> a) {
 
 string DPLL(State s, vector<string> atoms) {
     // replace with a while loop
-    cout << "starting with " << s.clauses.size() << " clauses: " << endl;
+//    cout << "starting with " << s.clauses.size() << " clauses: " << endl;
     vector<vector<string>> clauses = s.clauses;
     map<string, bool> bindings = s.bindings;
     if (clauses.size() == 0) { // done! solution found

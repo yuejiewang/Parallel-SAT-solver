@@ -16,6 +16,11 @@ namespace fs = std::filesystem;
 
 using namespace std;
 
+typedef vector<string> CLAUSE;
+typedef vector<CLAUSE> CNF;
+typedef map<string, bool> BIND;
+
+
 string getFileName(const string &s) {
 
     char sep = '/';
@@ -51,10 +56,9 @@ void runWithInputFile(string inputFileName) {
     cout << "reading: " << inputFileName << endl;
     while (getline(inputFile, line)) {
         line.erase(0, line.find_first_not_of(" \n\t"));
-
-        cout << "split into clauses: " + line << endl;
-
         // Output the text from the file
+//        cout << "valid line: ";
+//        cout << line << endl;
         if (line[0] == 'p') {
             problem_type = line[2];
             num_variables = (int) line[4];
