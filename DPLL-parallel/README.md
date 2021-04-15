@@ -37,9 +37,7 @@ For cims crunchy machines, first run `module load gcc-9.2` before running the pr
 DPLL output is in the form of:  
 > if `x` is true, `x` is printed  
 > if `y` is false, `-y` is printed  
-> if `z` can be either true or false, `\z` is printed  
-<<<<<<< HEAD
-=======
+> if `z` can be either true or false, `\z` is printed
 
 When running the shell scripts, the output is redirected to `TEST.txt` in the corresponding output directory and the correctness is automatically checked by python script: `check_sat.py`, which only checks the correctness if the cnf is satisfiable, and outputs `no solution` if the program doesn't find a solution.  
 
@@ -55,29 +53,11 @@ Input files with prefix `sat_` are satisfiable and others with prefix `unsat_` a
 ## Benchmarks
 > ./run_benchmark.sh
 > ./run_benchmark_large.sh
->>>>>>> change directories of input and output
 
 Will automatically run the tests in input/ and input_large/ with 1 2 4 8 16 32 64 threads and save the execution time in `benchmark_small_p${POW}_b{BATCH}.txt` and `benchmark_large_p${POW}_b{BATCH}.txt`
 The tests will run multiple times to take the average exectution time.
 
-<<<<<<< HEAD
-Run correctness check separately with inputfile `INPUT.cnf` and outputfile `output/OUTPUT.txt`: 
-> python3 check_sat.py -i INPUT.cnf -o OUTPUT.txt
-## Current test cases: 
 
-Input files with prefix `sat_` are satisfiable and others with prefix `unsat_` are unsatisfiable.  
-`input\`: tests that return within a few seconds  
-`large_input\`: tests that could run for several minutes  
-
-## Benchmarks
-> ./run_benchmark.sh
-> ./run_benchmark_large.sh
-
-Will automatically run the tests in input/ and input_large/ with 1 2 4 8 16 32 64 threads and save the execution time in `benchmark_small_p${POW}_b{BATCH}.txt` and `benchmark_large_p${POW}_b{BATCH}.txt`
-The tests will run multiple times to take the average exectution time.
-
-=======
->>>>>>> change directories of input and output
 # Pseudo Code
 
 This is the pseudo code for parallel DPLL  

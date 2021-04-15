@@ -21,35 +21,13 @@ typedef vector<CLAUSE> CNF;
 typedef map<string, bool> BIND;
 
 
-string getFileName(const string &s) {
-
-    char sep = '/';
-
-#ifdef _WIN32
-    sep = '\\';
-#endif
-
-    size_t i = s.rfind(sep, s.length());
-    if (i != string::npos) {
-        return (s.substr(i + 1, s.length() - i));
-    }
-
-    return ("");
-}
-
-
 void runWithInputFile(string inputFileName) {
     vector <vector<string>> originalClauses;
     // Create a text string, which is used to output the text file
     string line;
-    string problem_type;
-    int num_variables;
-    int num_clauses;
     // Read from the text file
     ifstream inputFile(inputFileName);
-    cout << inputFileName << endl;
     string filename =  fs::path( inputFileName ).stem();
-//    filename.erase(inputFileName.find_last_of("."), string::npos);
 
 
     // Use a while loop together with the getline() function to read the file line by line
@@ -57,12 +35,8 @@ void runWithInputFile(string inputFileName) {
     while (getline(inputFile, line)) {
         line.erase(0, line.find_first_not_of(" \n\t"));
         // Output the text from the file
-//        cout << "valid line: ";
-//        cout << line << endl;
         if (line[0] == 'p') {
-            problem_type = line[2];
-            num_variables = (int) line[4];
-            num_clauses = (int) line[6];
+            continue;
         } else if (line[0] != 'c' && (isdigit(line[0]) || line[0] == '-')) {
             vector <string> clauseStrings = splitIntoClauses(line);
             for (int i = 0; i < clauseStrings.size(); i++)
@@ -79,7 +53,9 @@ void runWithInputFile(string inputFileName) {
     vector <string> atoms = makeAtomList(originalClauses);
     map<string, bool> b;
     State original = State{false, originalClauses, b};
-    string answer = DPLL(original, atoms);
+    vector<State> stack;
+    stack.push_back(original);
+    string answer = DPLL(atoms, stack);
     string output;
     if (answer.compare("Fail") == 0) {
         output = "NO SOLUTION";
