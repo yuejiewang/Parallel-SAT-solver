@@ -47,12 +47,12 @@ do
 	filename=${file%.*}
 	filename=${filename##*/}
 	if [ ${B} -eq 0 ]; then
-		./dpll-parallel-p${POW} $file > ../output_parallel_p${POW}/$filename.txt
+		./dpll-parallel -p ${POW} $file > ../output_parallel_p${POW}/$filename.txt
 	else
 		i=1
 		while [ ${i} -le ${B} ]
 		do
-			./dpll-parallel-p${POW} $file $benchmark_file > ../output_parallel_p${POW}/$filename.txt 
+			./dpll-parallel -p ${POW} $file $benchmark_file > ../output_parallel_p${POW}/$filename.txt 
 			i=`expr ${i} + 1`
 		done
 	fi

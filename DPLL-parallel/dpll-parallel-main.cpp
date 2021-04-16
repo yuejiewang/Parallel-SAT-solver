@@ -34,9 +34,9 @@ typedef vector<string> CLAUSE;
 typedef vector<CLAUSE> CNF;
 typedef map<string, bool> BIND;
 
-static const int NTHREADS = pow(2, POW);
-static omp_lock_t lock[NTHREADS];
-list<State*> local_stack[NTHREADS];
+//static const int NTHREADS = pow(2, POW);
+static omp_lock_t lock[64];
+list<State*> local_stack[64];
 vector<State> sat;
 int global_flag = 0;
 omp_lock_t iolock;
@@ -66,17 +66,10 @@ string toString(BIND b, vector<string> a) {
 }
 
 // get tid for a busy thread using random strategy
-inline int getBusyThread() {
-//	usleep(1);
-	int randi = rand() % NTHREADS;
-//	if (!local_stack[randi].empty()) return randi;
-//	randi = rand() % NTHREADS;
-//	if (!local_stack[randi].empty()) return randi;
-//	randi = rand() % NTHREADS;
-//	if (!local_stack[randi].empty()) return randi;
-	// after generating three random numbers, just pick the first busy thread...
-	for (int t = randi; t < NTHREADS + randi; t++) {
-		int tmpi = t % NTHREADS;
+inline int getBusyThread(int total_t) {
+	int randi = rand() % total_t;
+	for (int t = randi; t < total_t + randi; t++) {
+		int tmpi = t % total_t;
 		if (!local_stack[tmpi].empty()) {
 			return tmpi;
 		}
@@ -89,7 +82,6 @@ inline int getBusyThread() {
 // critical section
 inline State* loadShare(int btid) {
 	if (btid == -1) return NULL;
-	// sequentially set lock to avoid deadlock
 	set(btid);
 	State* t = NULL;
 	if (!local_stack[btid].empty() && !global_flag) {
@@ -104,15 +96,11 @@ inline State* loadShare(int btid) {
 inline void clearStack(int ctid) {
 	set(ctid);
 	local_stack[ctid].clear();
-//	for (int i = 0; i < local_stack[ctid].size(); i++)
-//		local_stack[ctid].pop_back();
-//		delete *ii;
 	unset(ctid);
 }
 
 int main(int argc, char* argv[])
 {
-	cout << "# NTHREADS=" << NTHREADS << endl;
 	gettimeofday(&timeS, NULL);
 	omp_init_lock(&iolock);
 	CNF originalClauses;
@@ -120,13 +108,38 @@ int main(int argc, char* argv[])
 	string problem_type;
 	int num_variables;
 	int num_clauses;
-	if (argc < 2) {
-		cout << "no input" << endl;
-		exit(1);
+	int POW = 3;
+
+	// parse command line arguments
+	int idx = 0, _opt;
+	char* inputfilename = NULL;
+	char* outputfilename = NULL;
+	// parse options
+	opterr = 0;
+	while ((_opt = getopt(argc, argv, "p:")) != -1)
+		switch (_opt) {
+		case 'p':
+			POW = stoi(optarg);
+			break;
+		case '?':
+			printf("invalid option\n");
+		default:
+			abort();
+		}
+	int NTHREADS = pow(2, POW);
+	cout << "# NTHREADS=" << NTHREADS << endl;
+	// parse files
+	idx = optind;
+	if (argc < idx + 1) {
+		printf("missing inputfile name\n");
 	}
-	ifstream inputFile(argv[1]);
+	inputfilename = argv[idx];
+	if (argc >= idx + 2)
+		outputfilename = argv[idx + 1];
+
+	ifstream inputFile(inputfilename);
 	ofstream benchmarkFile;
-	string filename(argv[1]);
+	string filename(inputfilename);
 	if (!inputFile.is_open()) {
 		cout << "cannot open input file" << endl;
 		exit(1);
@@ -260,7 +273,7 @@ int main(int argc, char* argv[])
 			if (end_flag == 1) break;
 			if (end_flag == 2) {
 				root = NULL;
-				int busy = getBusyThread();
+				int busy = getBusyThread(NTHREADS);
 				if (busy != -1) {
 					root = loadShare(busy);
 					if (VFLAG) {
@@ -273,14 +286,14 @@ int main(int argc, char* argv[])
 
 			State* current_state = root;  // subtree traversal for this thread
 			while (current_state != NULL) {
-//				if (global_flag) break;
+				if (global_flag) break;
 				if (current_state->conflict) {
 					if (local_stack[tid].empty()) {
 						delete current_state;
 						current_state = NULL;
 						end_flag = 2;
-//						if (global_flag) break;
-						int busy = getBusyThread();
+						if (global_flag) break;
+						int busy = getBusyThread(NTHREADS);
 						if (busy != -1) {
 							current_state = loadShare(busy);
 							if (VFLAG) {
@@ -294,7 +307,7 @@ int main(int argc, char* argv[])
 					else {
 						delete current_state;
 						current_state = NULL;
-//						if (global_flag) break;
+						if (global_flag) break;
 // ---------------------------- critical section ----------------------------------------
 						set(tid);
 						if (local_stack[tid].empty()) current_state = NULL;
@@ -325,8 +338,8 @@ int main(int argc, char* argv[])
 						delete current_state;
 						current_state = NULL;
 						end_flag = 2;
-//						if (global_flag) break;
-						int busy = getBusyThread();
+						if (global_flag) break;
+						int busy = getBusyThread(NTHREADS);
 						if (busy != -1) {
 							current_state = loadShare(busy);
 							if (VFLAG) {
@@ -340,7 +353,7 @@ int main(int argc, char* argv[])
 					else {
 						delete current_state;
 						current_state = NULL;
-//						if (global_flag) break;
+						if (global_flag) break;
 // ---------------------------- critical section ----------------------------------------
 
 						set(tid);
@@ -375,7 +388,7 @@ int main(int argc, char* argv[])
 				*rstate = propagate(copy, split, true);
 				delete current_state;
 				current_state = lstate;
-//				if (global_flag) break;
+				if (global_flag) break;
 // ---------------------------- critical section ----------------------------------------
 				set(tid);
 				local_stack[tid].push_back(rstate);
@@ -406,17 +419,16 @@ int main(int argc, char* argv[])
 	long int interval = (timeE.tv_sec - timeS.tv_sec) * 1000000 + (timeE.tv_usec - timeS.tv_usec);
 	double exec_time_sec = interval * 1e-6;
 	double exec_time_ms = interval * 1e-3;
-	if (argc >= 3) {
-		benchmarkFile.open(argv[2], ios::app | ios::out);
+	if (outputfilename != NULL) {
+		benchmarkFile.open(outputfilename, ios::app | ios::out);
 	}
 	if (benchmarkFile.is_open()) {
 		benchmarkFile.setf(std::ios::left);
 		benchmarkFile << setw(50) << filename << " ";
 		benchmarkFile << std::fixed;
-		benchmarkFile << setprecision(6) << setw(10) << exec_time_sec << endl;
-//		benchmarkFile << setprecision(3) << setw(10) << exec_time_ms << endl;
-	} else {
-		printf("# execution-time(ms): %.6f %.3f\n", exec_time_sec, exec_time_ms);
+		benchmarkFile << setprecision(6) << setw(20) << exec_time_sec;
+		benchmarkFile << setprecision(3) << setw(20) << exec_time_ms << endl;
 	}
+	printf("# execution-time(s, ms): %.6f, %.3f\n", exec_time_sec, exec_time_ms);
 	return(0);
 }
