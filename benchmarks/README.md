@@ -1,3 +1,10 @@
+# Guide for running benchmarks
+To run all of the inputs in benchmarks/inputs through plinegling, lingeling, our DPLL parallel solver and our DPLL sequential solver, run 
+```
+python3 benchmarks.py `< executables.txt`
+```
+
+
 # Guide for running lingeling and plingeling SAT solvers
 
 For lingeling:
