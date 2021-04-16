@@ -8,11 +8,10 @@ Pseudo code for the algorithm design see below.
 
 ## Compile
 
-> make dpll-parallel [FPOW=pow] [FV=v]
+> make dpll-parallel [FV=v]
 
-`pow` is a non-negative int and thread number will be set to 2^pow  
 `v` is either 0 or 1, meaning verbose output for debugging  
-***default:*** pow = 3 and thread_number = 8, v = 0  
+***default:*** v = 0  
 
 * Clean up
 
@@ -20,17 +19,17 @@ Pseudo code for the algorithm design see below.
 
 ## Run parallel DPLL
 
-Run parallel DPLL with input file `TEST.cnf`  
+Run parallel DPLL with input file `TEST.cnf` and optional benchmark file `BENCHMARK.csv` to output the execution time  
 
-> ./dpll-parallel-p${pow} TEST.cnf  
+> ./dpll-parallel -p ${pow} TEST.cnf [BENCHMARK.csv]  
 
 **OR**  
 store `TEST.cnf` under `input/` or `large_input/` and run shell scripts:  
 > ./run.sh [-p pow] [-v]
 > ./run_large.sh [-p pow] [-v]  
 
-`pow` and `v` are defined the same as in makefile
 For cims crunchy machines, first run `module load gcc-9.2` before running the programming.  
+`pow` and `v` are defined the same as before
 
 ## Output format
 
@@ -38,30 +37,10 @@ DPLL output is in the form of:
 > if `x` is true, `x` is printed  
 > if `y` is false, `-y` is printed  
 > if `z` can be either true or false, `\z` is printed  
-<<<<<<< HEAD
-=======
 
-When running the shell scripts, the output is redirected to `TEST.txt` in the corresponding output directory and the correctness is automatically checked by python script: `check_sat.py`, which only checks the correctness if the cnf is satisfiable, and outputs `no solution` if the program doesn't find a solution.  
+When running the shell scripts, the output is redirected to `output_parallel_p${pow}/TEST.txt` and the correctness is automatically checked by python script: `check_sat.py`, which only checks the correctness if the cnf is satisfiable, and outputs `no solution` if the program doesn't find a solution.  
 
 Run correctness check separately with inputfile `INPUT.cnf` and outputfile `OUTPUT.txt`: 
-> python3 check_sat.py -i INPUT.cnf -o OUTPUT.txt  
-
-## Current test cases: 
-
-Input files with prefix `sat_` are satisfiable and others with prefix `unsat_` are unsatisfiable.  
-`input\`: tests that return within a few seconds  
-`large_input\`: tests that could run for several minutes  
-
-## Benchmarks
-> ./run_benchmark.sh
-> ./run_benchmark_large.sh
->>>>>>> change directories of input and output
-
-Will automatically run the tests in input/ and input_large/ with 1 2 4 8 16 32 64 threads and save the execution time in `benchmark_small_p${POW}_b{BATCH}.txt` and `benchmark_large_p${POW}_b{BATCH}.txt`
-The tests will run multiple times to take the average exectution time.
-
-<<<<<<< HEAD
-Run correctness check separately with inputfile `INPUT.cnf` and outputfile `output/OUTPUT.txt`: 
 > python3 check_sat.py -i INPUT.cnf -o OUTPUT.txt
 ## Current test cases: 
 
@@ -73,11 +52,9 @@ Input files with prefix `sat_` are satisfiable and others with prefix `unsat_` a
 > ./run_benchmark.sh
 > ./run_benchmark_large.sh
 
-Will automatically run the tests in input/ and input_large/ with 1 2 4 8 16 32 64 threads and save the execution time in `benchmark_small_p${POW}_b{BATCH}.txt` and `benchmark_large_p${POW}_b{BATCH}.txt`
-The tests will run multiple times to take the average exectution time.
+Will automatically run the tests in input/ and input_large/ with different thread numbers and save the execution time in `benchmark_small_p${POW}_b{BATCH}.txt` and `benchmark_large_p${POW}_b{BATCH}.txt`
+The tests will run multiple times to take the average execution time.
 
-=======
->>>>>>> change directories of input and output
 # Pseudo Code
 
 This is the pseudo code for parallel DPLL  
@@ -135,4 +112,3 @@ according to the current state, assign values for clauses that contains only one
 # TODO
 
 * look for more efficient ways to kill all threads when a solution is found  
-* change to `pthreads` for precise control over thread behaviors  
