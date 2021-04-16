@@ -1,7 +1,8 @@
 # NTHREADS=8
--1
+ 1
 -2
 -3
 -4
 -5
 
+# execution-time(s, ms): 0.012191, 12.191

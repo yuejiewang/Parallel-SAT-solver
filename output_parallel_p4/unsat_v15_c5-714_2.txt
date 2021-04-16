@@ -1,2 +1,3 @@
 # NTHREADS=16
 No solution
+# execution-time(s, ms): 0.069685, 69.685
