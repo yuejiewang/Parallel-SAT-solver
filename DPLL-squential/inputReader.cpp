@@ -34,6 +34,7 @@ vector<string> splitIntoClauses(string s) {
     trim(s);
     vector<string> clauseList;
     size_t pos0 = 0;
+//    cout << "split into clauses: " + s << endl;
     while ((pos0 = s.find(" 0")) != std::string::npos) {
         clauseList.push_back(s.substr(0, pos0));
         s.erase(0, pos0 + 2);

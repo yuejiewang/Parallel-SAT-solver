@@ -2,6 +2,7 @@
 #include <map>
 #include <vector>
 #include <algorithm>
+#include <iostream>
 #include "dpll.h"
 
 using namespace std;
@@ -13,12 +14,19 @@ string atom_of(string literal) {
     return literal;
 }
 
+void print(vector<vector<string>> clauses) {
+    for (const vector<string> &v : clauses) {
+        for (string x : v) cout << x << ' ';
+        cout << endl;
+    }
+}
 
 bool value_of(string literal) {
     return literal[0] != '-';
 }
 
 bool containsEmptyClause(vector<vector<string>> clauses) {
+    // replace with a data structure
     for (int i = 0; i < clauses.size(); i++) {
         if (clauses[i].size() == 0) {
             return true;
@@ -57,7 +65,7 @@ State handleEasyCases(State s) {
     while (stillChanging) {
         map<string, bool> oldBindings(s.bindings);
 //        cout << "starting with " << s.clauses.size() << " clauses: " << endl;
-//        printClauses(s.clauses);
+//        print(s.clauses);
         State resultState = State{s.clauses, s.bindings};
         for (int i = 0; i < s.clauses.size(); i++) {
             vector<string> clause = s.clauses[i];
@@ -111,35 +119,29 @@ string nextUnboundAtom(State s) {
     return unbound[0];
 }
 
-string stringifyBindings(map<string, bool> bindings, vector<string> atoms) {
-    map<int, bool> intBindings;
-    vector<string> either;
-    for (int i = 0; i < atoms.size(); i++) {
-        string atom = atoms[i];
-        if (bindings.find(atom) == bindings.end()) { // atom not in bindings
-            // add to list "either"
-            either.push_back(atom);
-            // add to bindings with value true
-            bindings.insert(pair<string, bool>(atom, true));
+string stringifyBindings(map<string, bool> b, vector<string> a) {
+    map<int, string> bmap;
+    string str = "";
+    for (size_t j = 0; j < a.size(); j++) {
+        string atom = a[j];
+        if (b.find(atom) != b.end()) {
+            if (b[atom] == false) bmap[stoi(atom)] = "-" + atom;
+            else bmap[stoi(atom)] = atom;
+        } else {
+            bmap[stoi(atom)] = "/" + atom;
         }
     }
-    for (auto const&[key, val] : bindings) {
-        intBindings.insert(pair<int, bool>(stoi(key), val));
+    for (auto const&[key, val] : bmap) {
+        str += val;
+        str += "\n";
     }
-    string result = "";
-    for (auto const&[key, val] : intBindings) {
-        result += to_string(key) + " ";
-        if (find(either.begin(), either.end(), to_string(key)) != either.end()) {
-            result += "true or false";
-        } else {
-            result += val ? "true" : "false";
-        };
-        result += "\n";
-    }
-    return result;
+    str += "\n";
+    return str;
 }
 
 string DPLL(State s, vector<string> atoms) {
+    // replace with a while loop
+//    cout << "starting with " << s.clauses.size() << " clauses: " << endl;
     vector<vector<string>> clauses = s.clauses;
     map<string, bool> bindings = s.bindings;
     if (clauses.size() == 0) { // done! solution found
