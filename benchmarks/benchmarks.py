@@ -52,8 +52,8 @@ def get_benchmark_results(executable, pow=None):
     for input_file in input_files:
         run_time = 0
         run_command = ""
-        if pow:
-            thread_count = 2**pow
+        if pow is not None:
+            thread_count = 2 ** pow
             if "dpll-parallel" in executable:
                 run_command += executable + " -p " + str(pow) + " " + input_file
             else:
@@ -79,7 +79,7 @@ for seq in sequential_executables:
     get_benchmark_results(seq)
 
 for par in parallel_executables:
-    for pow in range(7): # 0-6
+    for pow in range(7):  # 0-6
         get_benchmark_results(par, pow=pow)
 
 with open('benchmark_results.csv', 'w') as f:
