@@ -25,7 +25,7 @@ Run parallel DPLL with input file `TEST.cnf` and optional benchmark file `BENCHM
 
 **OR**  
 store `TEST.cnf` under `input/` or `large_input/` and run shell scripts:  
-> ./run.sh [-p pow] [-v]
+> ./run.sh [-p pow] [-v]  
 > ./run_large.sh [-p pow] [-v]  
 
 For cims crunchy machines, first run `module load gcc-9.2` before running the programming.  
@@ -49,10 +49,10 @@ Input files with prefix `sat_` are satisfiable and others with prefix `unsat_` a
 `large_input\`: tests that could run for several minutes  
 
 ## Benchmarks
-> ./run_benchmark.sh
+> ./run_benchmark.sh  
 > ./run_benchmark_large.sh
 
-Will automatically run the tests in input/ and input_large/ with different thread numbers and save the execution time in `benchmark_small_p${POW}_b{BATCH}.txt` and `benchmark_large_p${POW}_b{BATCH}.txt`
+Will automatically run the tests in input/ and input_large/ with different thread numbers and save the execution time in `benchmark_small_p${POW}_b{BATCH}.txt` and `benchmark_large_p${POW}_b{BATCH}.txt`  
 The tests will run multiple times to take the average execution time.
 
 # Pseudo Code
@@ -61,11 +61,11 @@ This is the pseudo code for parallel DPLL
 
 * data structure for nodes:  
 ``` c++
-struct State {
-	bool conflict;  // if this->clauses contains an empty clause
-    vector<vector<string>> clauses;  // the cnf expression
-    map<string, bool> bindings;  // the set of assigned values
-};
+struct State {  
+	bool conflict;  // if this->clauses contains an empty clause  
+	vector<vector<string>> clauses;  // the cnf expression  
+	map<string, bool> bindings;  // the set of assigned values  
+};  
 ```
 
 * the master thread before fork()
