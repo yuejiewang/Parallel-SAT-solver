@@ -27,6 +27,8 @@ parallel_executables = []
 
 i = 1
 while i < len(sys.argv):
+    if sys.argv[i] == "t":
+        TIMEOUT = float(sys.argv[i + 1])
     if sys.argv[i] == "s":
         sequential_executables.append(sys.argv[i + 1])
     if sys.argv[i] == "p":
