@@ -1,0 +1,4 @@
+s ./benchmarks/lingeling/lingeling
+p ./benchmarks/lingeling/plingeling
+s ../DPLL-squential/dpll-sequential
+p ../DPLL-parallel/dpll-parallel
