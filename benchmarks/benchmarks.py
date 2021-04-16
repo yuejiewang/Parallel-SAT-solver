@@ -20,7 +20,7 @@ import sys
 import time
 import subprocess
 
-TIMEOUT = 1
+TIMEOUT = 60
 
 sequential_executables = []
 parallel_executables = []
@@ -79,7 +79,7 @@ for seq in sequential_executables:
     get_benchmark_results(seq)
 
 for par in parallel_executables:
-    for pow in range(6):
+    for pow in range(7): # 0-6
         get_benchmark_results(par, pow=pow)
 
 with open('benchmark_results.csv', 'w') as f:
