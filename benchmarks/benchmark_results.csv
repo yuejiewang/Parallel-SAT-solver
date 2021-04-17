@@ -1,4 +1,4 @@
-Model,Benchmark,Thread Count,Time (ms)
+Model,Benchmark,Thread Count,Time (s)
 lingeling,phole/02.cnf,1,0.08038997650146484
 lingeling,phole/03.cnf,1,0.0904688835144043
 lingeling,phole/01.cnf,1,0.07997822761535645

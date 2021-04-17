@@ -1,24 +1,12 @@
-"""plingeling
-lingeling
-DPLL sequential
-DPLL parallel
-
-for each of those, varying the number of threads (1-64), time all the test cases and take an average
-
-benchmark.py expected behavior:
- 1. take list of executables as commandline input
- 2. run each executable on each input in benchmarks/inputs
-    - time each run and keep it in a file called benchmark_results.csv which has columns:
-        Model,Benchmark,Thread Count,Time (ms)
-
-
-- benchmarks script (lorenzo to send plingeeling and lingeling instructions and sample cnf files to test with)"""
-
 import csv
 import os
 import sys
 import time
 import subprocess
+
+"""
+See README.md for details on arguments to pass in and behavior
+"""
 
 TIMEOUT = 60
 
@@ -38,7 +26,7 @@ while i < len(sys.argv):
 print(sequential_executables)
 print(parallel_executables)
 
-fields = ["Model", "Benchmark", "Thread Count", "Time (ms)"]
+fields = ["Model", "Benchmark", "Thread Count", "Time (s)"]
 rows = []
 
 input_dir = "inputs"
