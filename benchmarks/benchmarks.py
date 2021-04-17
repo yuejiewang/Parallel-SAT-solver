@@ -84,9 +84,13 @@ for par in parallel_executables:
     for pow in range(7):  # 0-6
         get_benchmark_results(par, pow=pow)
 
-with open('dpll_seq_benchmark_results.csv', 'w') as f:
-    # using csv.writer method from CSV package
-    write = csv.writer(f)
+output_filename = "benchmark_results"
+i = 0
+while os.path.exists(f"{output_filename}{i}.csv"):
+    i += 1
 
+with open(f"{output_filename}{i}.csv", 'w') as f:
+    write = csv.writer(f)
     write.writerow(fields)
     write.writerows(rows)
+    print(f"done writing output to '{output_filename}{i}.csv'")

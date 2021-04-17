@@ -1,2 +1,10 @@
-s ../DPLL-squential/dpll-sequential
-t 200
+s
+./lingeling/lingeling
+p
+./lingeling/plingeling
+s
+../DPLL-squential/dpll-sequential
+p
+../DPLL-parallel/dpll-parallel
+t
+200
