@@ -3,7 +3,8 @@ import os
 from check_sat import *
 
 input_dir = "../input/"
-par_output_dirs = ["../output_parallel_p0/", "../output_parallel_p1/", "../output_parallel_p2/","../output_parallel_p3/", "../output_parallel_p4/"]
+par_output_dirs = ["../output_parallel_p0/", "../output_parallel_p1/", "../output_parallel_p2/",
+                   "../output_parallel_p3/", "../output_parallel_p4/"]
 seq_output_dir = "../sequential_output/"
 
 input_files = os.listdir(input_dir)
