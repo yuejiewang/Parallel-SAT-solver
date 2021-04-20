@@ -77,8 +77,8 @@ unsat_speedup_plot <- unsat_benchmarks %>%
   geom_point() + 
   facet_grid(~benchmark) +
   ggtitle("UNSAT Speedup") +
-  ylab("Average Time (seconds)") +
-  scale_x_continuous("Number of Threads", breaks = 2^(0:6))
+  ylab("Speedup") +
+  scale_x_continuous("Number of Threads", breaks = c(1,8,16,32,64))
 
 ggsave("unsat_speedup_plot_benchmarks_plot.png", plot = unsat_speedup_plot)
 
@@ -92,7 +92,7 @@ sat_speedup_plot <- sat_benchmarks %>%
   geom_point() + 
   facet_grid(~benchmark) +
   ggtitle("SAT Speedup") +
-  ylab("Average Time (seconds)") +
-  scale_x_continuous("Number of Threads", breaks = 2^(0:6))
+  ylab("Speedup") +
+  scale_x_continuous("Number of Threads", breaks = c(1,8,16,32,64))
 
 ggsave("sat_speedup_plot_benchmarks_plot.png", plot = sat_speedup_plot)
