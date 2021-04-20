@@ -16,6 +16,13 @@ python3 benchmarks.py `< executables.txt`
 
 # Guide for running lingeling and plingeling SAT solvers
 
+To clone from github and install the lingeling/plingeling solvers do
+
+```
+chmod +x get_lingeling_solvers.sh
+./get_lingeling_solvers.sh
+```
+
 For lingeling:
 
 `./benchmarks/lingeling/lingeling input.cnf`

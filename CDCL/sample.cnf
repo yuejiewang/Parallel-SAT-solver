@@ -1,6 +1,0 @@
-c sample.cnf
-c comments start with 'c' - the preprocessor will ignore these lines.
-c the line after th co
-p cnf 3 2
-1 -3 0
-2 3 -1 0

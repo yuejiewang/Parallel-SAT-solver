@@ -1,2 +1,6 @@
 lingeling/
 output.txt
+.nfs*
+*.Rproj
+.Rproj.user/
+.Rhistory
