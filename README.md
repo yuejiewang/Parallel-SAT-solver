@@ -85,7 +85,7 @@ Note: This does not run the solvers, it just checks the output that has already 
 To run all of the inputs in benchmarks/inputs through plinegling, lingeling, our DPLL parallel solver and our DPLL
 sequential solver, run:
 
-> python3 benchmarks/benchmarks.py `< executables.txt`
+> python3 benchmarks/benchmarks.py \`< executables.txt\`
 
 Additional information on how the benchmark script works and what it does in `benchmarks/README.md`
 
