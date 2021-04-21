@@ -27,14 +27,10 @@
 
 using namespace std;
 
-//static const int NTHREADS = 16;
-//static const int POW = 4;
-//static const bool VFLAG = false;
 typedef vector<string> CLAUSE;
 typedef vector<CLAUSE> CNF;
 typedef map<string, bool> BIND;
 
-//static const int NTHREADS = pow(2, POW);
 static omp_lock_t lock[64];
 list<State*> local_stack[64];
 vector<State> sat;

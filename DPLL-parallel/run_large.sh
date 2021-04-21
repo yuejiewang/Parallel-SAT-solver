@@ -42,7 +42,7 @@ if [ ${B} -ne 0 ]; then
 		rm -f $benchmark_file
 	fi
 fi
-for file in ../large_input/*
+for file in ../input_large/*
 do
 	filename=${file%.*}
 	filename=${filename##*/}
