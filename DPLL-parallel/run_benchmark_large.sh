@@ -8,7 +8,7 @@
 PATH=/home/edison/bin:/home/edison/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/work/tools/gcc-3.4.5-glibc-2.3.6/bin
 export PATH
 
-for p in 6 5 4 3 2
+for p in 0 1 2 3 4 5 6
 do
-	./run_large.sh -b 4 -p ${p}
+	./run_large.sh -b 2 -p ${p}
 done
