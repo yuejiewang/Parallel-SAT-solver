@@ -17,7 +17,7 @@
 `v` is either 0 or 1, meaning verbose output for debugging  
 ***default:*** v = 0
 
-For cims crunchy machines, first run `module load gcc-9.2` before running the programming.
+For cims crunchy machines, first run `module load gcc-9.2` before running the program.
 
 ###### Run
 
@@ -27,7 +27,7 @@ time
 > ./dpll-parallel -p ${pow} INPUT.cnf [BENCHMARK.csv]
 
 **OR**  
-to run with all input in `input/` or `large_input/`, you can run the following shell scripts:
+to run with all input in `input/` or `input_large/`, you can run the following shell scripts:
 > ./run.sh [-p pow] [-v]  
 > ./run_large.sh [-p pow] [-v]
 
